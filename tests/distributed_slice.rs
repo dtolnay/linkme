@@ -23,3 +23,11 @@ fn test() {
 
     assert_eq!(sum, 9 + 99 + 999);
 }
+
+#[test]
+fn test_empty() {
+    #[distributed_slice]
+    static EMPTY: [i32] = [..];
+
+    assert!(EMPTY.is_empty());
+}
