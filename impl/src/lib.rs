@@ -4,6 +4,7 @@ mod args;
 mod declaration;
 mod derive;
 mod element;
+mod linker;
 
 use proc_macro::TokenStream;
 use syn::parse_macro_input;

@@ -3,6 +3,8 @@ use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{bracketed, Attribute, Error, Ident, Token, Type, Visibility};
 
+use crate::linker;
+
 struct Declaration {
     attrs: Vec<Attribute>,
     vis: Visibility,
@@ -50,9 +52,9 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let ident = decl.ident;
     let ty = decl.ty;
 
-    let section = format!("linkme_{}", ident);
-    let section_start = format!("__start_linkme_{}", ident);
-    let section_stop = format!("__stop_linkme_{}", ident);
+    let section = linker::linux::section(&ident);
+    let section_start = linker::linux::section_start(&ident);
+    let section_stop = linker::linux::section_stop(&ident);
 
     let call_site = Span::call_site();
     let ident_str = ident.to_string();
