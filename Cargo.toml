@@ -1,0 +1,5 @@
+[package]
+name = "linkme"
+version = "0.0.0"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+edition = "2018"
