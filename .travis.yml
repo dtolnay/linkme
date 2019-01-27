@@ -9,3 +9,5 @@ matrix:
   include:
     - rust: 1.31.0
       script: cargo test --tests
+    - rust: nightly
+      os: osx
