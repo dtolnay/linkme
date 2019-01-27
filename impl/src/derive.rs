@@ -14,7 +14,8 @@ pub fn expand(input: DeriveInput) -> TokenStream {
     }
 
     let ident = linkme_ident.expect("attribute linkme_ident");
-    let section = linker::linux::section(&ident);
+    let linux_section = linker::linux::section(&ident);
+    let macos_section = linker::macos::section(&ident);
 
     TokenStream::from(quote! {
         #[doc(hidden)]
@@ -22,7 +23,8 @@ pub fn expand(input: DeriveInput) -> TokenStream {
         macro_rules! #ident {
             ($item:item) => {
                 #[used]
-                #[link_section = #section]
+                #[cfg_attr(target_os = "linux", link_section = #linux_section)]
+                #[cfg_attr(target_os = "macos", link_section = #macos_section)]
                 $item
             };
         }
