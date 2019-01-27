@@ -24,7 +24,7 @@ pub fn distributed_slice(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[doc(hidden)]
-#[proc_macro_derive(link_section_macro, attributes(linkme_macro, linkme_section))]
+#[proc_macro_derive(link_section_macro, attributes(linkme_ident))]
 pub fn link_section_macro(input: TokenStream) -> TokenStream {
     let expanded = derive::expand(parse_macro_input!(input));
     TokenStream::from(expanded)
