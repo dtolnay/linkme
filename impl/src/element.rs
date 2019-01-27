@@ -49,8 +49,7 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
                     linkme::DistributedSlice::private_typecheck(#path, #uninit)
                 }
 
-                let __linkme = #expr_semi
-                __linkme
+                [#expr_semi 1][0]
             };
         }
     })
