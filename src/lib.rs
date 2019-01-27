@@ -100,4 +100,4 @@ pub mod private;
 
 pub use linkme_impl::*;
 
-pub use distributed_slice::DistributedSlice;
+pub use crate::distributed_slice::DistributedSlice;
