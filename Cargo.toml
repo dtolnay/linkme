@@ -2,6 +2,11 @@
 name = "linkme"
 version = "0.0.0"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Safe cross-platform linker shenanigans"
+repository = "https://github.com/dtolnay/linkme"
+documentation = "https://docs.rs/linkme"
+readme = "README.md"
 edition = "2018"
 
 [dependencies]
