@@ -4,6 +4,98 @@ use core::slice;
 
 use crate::private::Slice;
 
+/// Collection of static elements that are gathered into a contiguous section of
+/// the binary by the linker.
+///
+/// The implementation is based on `link_section` attributes and
+/// platform-specific linker support. It does not involve life-before-main or
+/// any other runtime initialization on any platform. This is a zero-cost safe
+/// abstraction that operates entirely during compilation and linking.
+///
+/// ## Declaration
+///
+/// A static distributed slice may be declared by writing `#[distributed_slice]`
+/// on a static item whose type is `[T]` for some type `T`. The initializer
+/// expression must be `[..]` to indicate that elements come from elsewhere.
+///
+/// ```
+/// # struct Bencher;
+/// #
+/// use linkme::distributed_slice;
+///
+/// #[distributed_slice]
+/// pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// ```
+///
+/// The attribute rewrites the `[T]` type of the static into
+/// `DistributedSlice<[T]>`, so the static in the example technically has type
+/// `DistributedSlice<[fn(&mut Bencher)]>`.
+///
+/// ## Elements
+///
+/// Slice elements may be registered into a distributed slice by a
+/// `#[distributed_slice(...)]` attribute in which the path to the distributed
+/// slice is given in the parentheses. The initializer is required to be a const
+/// expression.
+///
+/// Elements may be defined in the same crate that declares the distributed
+/// slice, or in any downstream crate. Elements across all crates linked into
+/// the final binary will be observed to be present in the slice at runtime.
+///
+/// ```
+/// # mod other_crate {
+/// #     use linkme::distributed_slice;
+/// #
+/// #     pub struct Bencher;
+/// #
+/// #     #[distributed_slice]
+/// #     pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// # }
+/// #
+/// # use other_crate::Bencher;
+/// #
+/// use linkme::distributed_slice;
+/// use other_crate::BENCHMARKS;
+///
+/// #[distributed_slice(BENCHMARKS)]
+/// static BENCH_DESERIALIZE: fn(&mut Bencher) = bench_deserialize;
+///
+/// fn bench_deserialize(b: &mut Bencher) {
+///     /* ... */
+/// }
+/// ```
+///
+/// The compiler will require that the static element type matches with the
+/// element type of the distributed slice. If the two do not match, the program
+/// will not compile.
+///
+/// ```compile_fail
+/// # mod other_crate {
+/// #     use linkme::distributed_slice;
+/// #
+/// #     pub struct Bencher;
+/// #
+/// #     #[distributed_slice]
+/// #     pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// # }
+/// #
+/// # use linkme::distributed_slice;
+/// # use other_crate::BENCHMARKS;
+/// #
+/// #[distributed_slice(BENCHMARKS)]
+/// static BENCH_WTF: usize = 999;
+/// ```
+///
+/// ```text
+/// error[E0308]: mismatched types
+///   --> src/distributed_slice.rs:65:19
+///    |
+/// 17 | static BENCH_WTF: usize = 999;
+///    |                   ^^^^^ expected fn pointer, found usize
+///    |
+///    = note: expected type `fn(&mut other_crate::Bencher)`
+///               found type `usize`
+/// ```
 pub struct DistributedSlice<T: ?Sized + Slice> {
     start: StaticPtr<T::Element>,
     stop: StaticPtr<T::Element>,
@@ -42,6 +134,39 @@ impl<T> DistributedSlice<[T]> {
 }
 
 impl<T> DistributedSlice<[T]> {
+    /// Retrieve a contiguous slice containing all the elements linked into this
+    /// program.
+    ///
+    /// **Note**: Ordinarily this method should not need to be called because
+    /// `DistributedSlice<[T]>` already behaves like `&'static [T]` in most ways
+    /// through the power of `Deref`. In particular, iteration and indexing and
+    /// method calls can all happen directly on the static without calling
+    /// `static_slice()`.
+    ///
+    /// ```no_run
+    /// # struct Bencher;
+    /// #
+    /// use linkme::distributed_slice;
+    ///
+    /// #[distributed_slice]
+    /// static BENCHMARKS: [fn(&mut Bencher)] = [..];
+    ///
+    /// fn main() {
+    ///     // Iterate the elements.
+    ///     for bench in BENCHMARKS {
+    ///         /* ... */
+    ///     }
+    ///
+    ///     // Index into the elements.
+    ///     let first = BENCHMARKS[0];
+    ///
+    ///     // Slice the elements.
+    ///     let except_first = &BENCHMARKS[1..];
+    ///
+    ///     // Invoke methods on the underlying slice.
+    ///     let len = BENCHMARKS.len();
+    /// }
+    /// ```
     pub fn static_slice(self) -> &'static [T] {
         let stride = mem::size_of::<T>();
 
