@@ -10,7 +10,7 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies]
-linkme-impl = { version = "0.1", path = "impl" }
+linkme-impl = { version = "=0.1.0", path = "impl" }
 
 [workspace]
 members = ["impl"]
