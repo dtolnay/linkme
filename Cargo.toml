@@ -3,3 +3,9 @@ name = "linkme"
 version = "0.0.0"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 edition = "2018"
+
+[dependencies]
+linkme-impl = { version = "0.0", path = "impl" }
+
+[workspace]
+members = ["impl"]
