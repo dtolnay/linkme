@@ -16,6 +16,7 @@ pub fn expand(input: DeriveInput) -> TokenStream {
     let ident = linkme_ident.expect("attribute linkme_ident");
     let linux_section = linker::linux::section(&ident);
     let macos_section = linker::macos::section(&ident);
+    let windows_section = linker::windows::section(&ident);
 
     TokenStream::from(quote! {
         #[doc(hidden)]
@@ -25,6 +26,7 @@ pub fn expand(input: DeriveInput) -> TokenStream {
                 #[used]
                 #[cfg_attr(target_os = "linux", link_section = #linux_section)]
                 #[cfg_attr(target_os = "macos", link_section = #macos_section)]
+                #[cfg_attr(target_os = "windows", link_section = #windows_section)]
                 $item
             };
         }
