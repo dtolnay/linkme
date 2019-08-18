@@ -29,3 +29,19 @@ pub mod macos {
         format!("\x01section$end$__DATA$__{}", ident)
     }
 }
+
+pub mod windows {
+    use syn::Ident;
+
+    pub fn section(ident: &Ident) -> String {
+        format!(".linkme_{}$b", ident)
+    }
+
+    pub fn section_start(ident: &Ident) -> String {
+        format!(".linkme_{}$a", ident)
+    }
+
+    pub fn section_stop(ident: &Ident) -> String {
+        format!(".linkme_{}$c", ident)
+    }
+}

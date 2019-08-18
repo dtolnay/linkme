@@ -59,6 +59,9 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let macos_section_start = linker::macos::section_start(&ident);
     let macos_section_stop = linker::macos::section_stop(&ident);
 
+    let windows_section_start = linker::windows::section_start(&ident);
+    let windows_section_stop = linker::windows::section_stop(&ident);
+
     let call_site = Span::call_site();
     let ident_str = ident.to_string();
     let link_section_macro_dummy = format!("_linkme_macro_{}", ident);
@@ -70,19 +73,28 @@ pub fn expand(input: TokenStream) -> TokenStream {
             extern "C" {
                 #[cfg_attr(target_os = "linux", link_name = #linux_section_start)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_start)]
+                #[cfg(any(target_os = "linux", target_os = "macos"))]
                 static LINKME_START: <#ty as linkme::private::Slice>::Element;
 
                 #[cfg_attr(target_os = "linux", link_name = #linux_section_stop)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_stop)]
+                #[cfg(any(target_os = "linux", target_os = "macos"))]
                 static LINKME_STOP: <#ty as linkme::private::Slice>::Element;
             }
 
-            #[used]
+            #[cfg_attr(target_os = "windows", link_section = #windows_section_start)]
+            #[cfg(target_os = "windows")]
+            static LINKME_START: () = ();
+
+            #[cfg_attr(target_os = "windows", link_section = #windows_section_stop)]
+            #[cfg(target_os = "windows")]
+            static LINKME_STOP: () = ();
+
             #[cfg_attr(target_os = "linux", link_section = #linux_section)]
-            #[cfg(not(target_os = "macos"))]
+            #[cfg(target_os = "linux")]
             static LINKME_PLEASE: [<#ty as linkme::private::Slice>::Element; 0] = [];
 
-            #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+            #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
             #unsupported_platform
 
             unsafe {
