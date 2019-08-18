@@ -11,3 +11,5 @@ matrix:
       script: cargo test --tests
     - rust: nightly
       os: osx
+    - rust: nightly
+      os: windows

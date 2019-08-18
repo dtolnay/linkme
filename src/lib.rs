@@ -6,7 +6,7 @@
 //!
 //! | Component | Linux | macOS | Windows | Other...<sup>†</sup> |
 //! |:---|:---:|:---:|:---:|:---:|
-//! | Distributed slice | ✅ | ✅ | *planned* | |
+//! | Distributed slice | ✅ | ✅ | ✅ | |
 //!
 //! <br>***<sup>†</sup>*** We welcome PRs adding support for any platforms not
 //! listed here.
