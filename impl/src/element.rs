@@ -45,6 +45,7 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
         #path ! {
             #(#attrs)*
             #vis static #ident : #ty = {
+                #[allow(deprecated)]
                 unsafe fn __typecheck(_: linkme::private::Void) {
                     linkme::DistributedSlice::private_typecheck(#path, #uninit)
                 }
