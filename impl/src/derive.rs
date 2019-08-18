@@ -9,7 +9,7 @@ pub fn expand(input: DeriveInput) -> TokenStream {
     let mut linkme_ident = None;
     for attr in input.attrs {
         if attr.path.is_ident("linkme_ident") {
-            linkme_ident = parse_linkme_ident.parse2(attr.tts).ok();
+            linkme_ident = parse_linkme_ident.parse2(attr.tokens).ok();
         }
     }
 
