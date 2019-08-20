@@ -91,6 +91,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
             #[cfg(target_os = "linux")]
             #[link_section = #linux_section]
+            #[used]
             static LINKME_PLEASE: [<#ty as linkme::private::Slice>::Element; 0] = [];
 
             #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
