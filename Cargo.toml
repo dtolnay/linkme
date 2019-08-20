@@ -1,6 +1,6 @@
 [package]
 name = "linkme"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Safe cross-platform linker shenanigans"
@@ -10,7 +10,7 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies]
-linkme-impl = { version = "=0.1.2", path = "impl" }
+linkme-impl = { version = "=0.1.3", path = "impl" }
 
 [workspace]
 members = ["impl"]
