@@ -13,3 +13,7 @@ matrix:
       os: osx
     - rust: nightly
       os: windows
+
+script:
+  - cargo test
+  - cargo test --release
