@@ -15,6 +15,7 @@ matrix:
       os: windows
     - rust: nightly
       name: Cortex-M
+      install: rustup target add thumbv7m-none-eabi
       script: cd tests/cortex && cargo run --release
 
 script:
