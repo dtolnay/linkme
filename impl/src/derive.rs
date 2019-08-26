@@ -24,7 +24,7 @@ pub fn expand(input: DeriveInput) -> TokenStream {
         macro_rules! #ident {
             ($item:item) => {
                 #[used]
-                #[cfg_attr(target_os = "linux", link_section = #linux_section)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
                 #[cfg_attr(target_os = "macos", link_section = #macos_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
                 $item

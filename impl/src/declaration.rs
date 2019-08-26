@@ -70,13 +70,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
     TokenStream::from(quote! {
         #(#attrs)*
         #vis static #ident: linkme::DistributedSlice<#ty> = {
-            #[cfg(any(target_os = "linux", target_os = "macos"))]
+            #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos"))]
             extern "C" {
-                #[cfg_attr(target_os = "linux", link_name = #linux_section_start)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_start)]
                 static LINKME_START: <#ty as linkme::private::Slice>::Element;
 
-                #[cfg_attr(target_os = "linux", link_name = #linux_section_stop)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_stop)]
                 static LINKME_STOP: <#ty as linkme::private::Slice>::Element;
             }
@@ -89,12 +89,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[link_section = #windows_section_stop]
             static LINKME_STOP: () = ();
 
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "none", target_os = "linux"))]
             #[link_section = #linux_section]
             #[used]
             static LINKME_PLEASE: [<#ty as linkme::private::Slice>::Element; 0] = [];
 
-            #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+            #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows")))]
             #unsupported_platform
 
             unsafe {
