@@ -13,6 +13,9 @@ matrix:
       os: osx
     - rust: nightly
       os: windows
+    - rust: nightly
+      name: Cortex-M
+      script: cd tests/cortex && cargo run --release
 
 script:
   - cargo test
