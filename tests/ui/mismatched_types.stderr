@@ -1,0 +1,10 @@
+error[E0308]: mismatched types
+ --> $DIR/mismatched_types.rs:9:19
+  |
+9 | static BENCH_WTF: usize = 999;
+  |                   ^^^^^ expected fn pointer, found usize
+  |
+  = note: expected type `for<'r> fn(&'r mut Bencher)`
+             found type `usize`
+
+For more information about this error, try `rustc --explain E0308`.

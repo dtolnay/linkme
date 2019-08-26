@@ -12,5 +12,9 @@ edition = "2018"
 [dependencies]
 linkme-impl = { version = "=0.1.4", path = "impl" }
 
+[dev-dependencies]
+rustversion = "0.1"
+trybuild = "1.0"
+
 [workspace]
 members = ["impl"]
