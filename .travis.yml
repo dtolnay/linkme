@@ -13,6 +13,11 @@ matrix:
       os: osx
     - rust: nightly
       os: windows
+    - rust: nightly
+      name: Cortex-M
+      before_install: sudo apt-get install -y qemu-system-arm
+      install: rustup target add thumbv7m-none-eabi
+      script: cd tests/cortex && cargo run --release
 
 script:
   - cargo test

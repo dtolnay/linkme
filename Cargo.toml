@@ -17,4 +17,4 @@ rustversion = "0.1"
 trybuild = "1.0"
 
 [workspace]
-members = ["impl"]
+members = ["impl", "tests/cortex"]
