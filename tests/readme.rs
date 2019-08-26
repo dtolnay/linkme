@@ -17,9 +17,7 @@ fn bench_deserialize(_b: &mut Bencher) {
 #[test]
 fn readme() {
     // Iterate the elements.
-    for _bench in BENCHMARKS {
-        /* ... */
-    }
+    for _bench in BENCHMARKS { /* ... */ }
 
     // Index into the elements.
     let _first = BENCHMARKS[0];
