@@ -109,7 +109,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[derive(linkme::link_section_macro)]
             #[linkme_ident = #ident_str]
             #[linkme_macro = #link_section_macro_dummy_str]
-            struct _linkme_dummy;
+            struct _linkme_macro;
         }
 
         #[doc(hidden)]
