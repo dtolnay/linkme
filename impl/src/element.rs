@@ -2,6 +2,7 @@ use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{Attribute, Ident, Path, Token, Type, Visibility};
+use std::iter::FromIterator;
 
 pub struct Element {
     attrs: Vec<Attribute>,
@@ -20,11 +21,11 @@ impl Parse for Element {
         input.parse::<Token![:]>()?;
         let ty: Type = input.parse()?;
         input.parse::<Token![=]>()?;
-        let mut expr_semi: Vec<_> = input.parse::<TokenStream>()?.into_iter().collect();
+        let mut expr_semi = Vec::from_iter(input.parse::<TokenStream>()?);
         if let Some(tail) = expr_semi.pop() {
-            syn::parse2::<Token![;]>(std::iter::once(tail).collect())?;
+            syn::parse2::<Token![;]>(TokenStream::from(tail))?;
         }
-        let expr = expr_semi.into_iter().collect();
+        let expr = TokenStream::from_iter(expr_semi);
         Ok(Element {
             attrs,
             vis,
