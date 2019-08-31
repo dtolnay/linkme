@@ -7,3 +7,7 @@ impl<T> Slice for [T] {
 }
 
 pub enum Void {}
+
+pub fn value<T>() -> T {
+    panic!()
+}
