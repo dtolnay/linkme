@@ -34,11 +34,13 @@ fn test_empty() {
 
 #[test]
 fn test_non_copy() {
-    struct NonCopy;
+    struct NonCopy(i32);
 
     #[distributed_slice]
     static NONCOPY: [NonCopy] = [..];
 
     #[distributed_slice(NONCOPY)]
-    static ELEMENT: NonCopy = NonCopy;
+    static ELEMENT: NonCopy = NonCopy(9);
+
+    assert!(!NONCOPY.is_empty());
 }
