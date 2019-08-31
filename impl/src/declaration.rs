@@ -66,6 +66,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let ident_str = ident.to_string();
     let link_section_macro_dummy_str = format!("_linkme_macro_{}", ident);
     let link_section_macro_dummy = Ident::new(&link_section_macro_dummy_str, call_site);
+    let link_section_mod_dummy_str = format!("_linkme_module_{}", ident);
+    let link_section_mod_dummy = Ident::new(&link_section_mod_dummy_str, call_site);
 
     TokenStream::from(quote! {
         #(#attrs)*
@@ -103,12 +105,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
         };
 
         #[macro_use]
-        mod #link_section_macro_dummy {
+        mod #link_section_mod_dummy {
             #[derive(linkme::link_section_macro)]
             #[linkme_ident = #ident_str]
             #[linkme_macro = #link_section_macro_dummy_str]
-            struct __linkme_dummy;
+            struct _linkme_dummy;
         }
+
         #[doc(hidden)]
         #vis use #link_section_macro_dummy as #ident;
     })
