@@ -44,13 +44,12 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
     let expr = input.expr;
 
     let span = quote!(#ty).into_iter().next().unwrap().span();
-    let uninit = quote_spanned!(span=> core::mem::uninitialized::<#ty>());
+    let uninit = quote_spanned!(span=> linkme::private::value::<#ty>());
 
     TokenStream::from(quote! {
         #path ! {
             #(#attrs)*
             #vis static #ident : #ty = {
-                #[allow(deprecated, invalid_value)]
                 unsafe fn __typecheck(_: linkme::private::Void) {
                     linkme::DistributedSlice::private_typecheck(#path, #uninit)
                 }
