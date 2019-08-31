@@ -7,13 +7,17 @@ use crate::linker;
 
 pub fn expand(input: DeriveInput) -> TokenStream {
     let mut linkme_ident = None;
+    let mut linkme_macro = None;
     for attr in input.attrs {
         if attr.path.is_ident("linkme_ident") {
             linkme_ident = parse_linkme_ident.parse2(attr.tokens).ok();
+        } else if attr.path.is_ident("linkme_macro") {
+            linkme_macro = parse_linkme_ident.parse2(attr.tokens).ok();
         }
     }
 
     let ident = linkme_ident.expect("attribute linkme_ident");
+    let ident_macro = linkme_macro.expect("attribute linkme_macro");
     let linux_section = linker::linux::section(&ident);
     let macos_section = linker::macos::section(&ident);
     let windows_section = linker::windows::section(&ident);
@@ -21,7 +25,7 @@ pub fn expand(input: DeriveInput) -> TokenStream {
     TokenStream::from(quote! {
         #[doc(hidden)]
         #[macro_export]
-        macro_rules! #ident {
+        macro_rules! #ident_macro {
             ($item:item) => {
                 #[used]
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
