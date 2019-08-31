@@ -1,6 +1,6 @@
 [package]
 name = "linkme"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Safe cross-platform linker shenanigans"
@@ -14,7 +14,7 @@ name = "module_2015"
 edition = "2015"
 
 [dependencies]
-linkme-impl = { version = "=0.1.5", path = "impl" }
+linkme-impl = { version = "=0.1.6", path = "impl" }
 
 [dev-dependencies]
 rustversion = "0.1"
