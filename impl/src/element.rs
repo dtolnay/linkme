@@ -8,7 +8,7 @@ pub struct Element {
     vis: Visibility,
     ident: Ident,
     ty: Type,
-    expr_semi: TokenStream,
+    expr: TokenStream,
 }
 
 impl Parse for Element {
@@ -20,13 +20,17 @@ impl Parse for Element {
         input.parse::<Token![:]>()?;
         let ty: Type = input.parse()?;
         input.parse::<Token![=]>()?;
-        let expr_semi: TokenStream = input.parse()?;
+        let mut expr_semi: Vec<_> = input.parse::<TokenStream>()?.into_iter().collect();
+        if let Some(tail) = expr_semi.pop() {
+            syn::parse2::<Token![;]>(std::iter::once(tail).collect())?;
+        }
+        let expr = expr_semi.into_iter().collect();
         Ok(Element {
             attrs,
             vis,
             ident,
             ty,
-            expr_semi,
+            expr,
         })
     }
 }
@@ -36,7 +40,7 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
     let vis = input.vis;
     let ident = input.ident;
     let ty = input.ty;
-    let expr_semi = input.expr_semi;
+    let expr = input.expr;
 
     let span = quote!(#ty).into_iter().next().unwrap().span();
     let uninit = quote_spanned!(span=> core::mem::uninitialized::<#ty>());
@@ -50,7 +54,7 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
                     linkme::DistributedSlice::private_typecheck(#path, #uninit)
                 }
 
-                [#expr_semi 1][0]
+                #expr
             };
         }
     })
