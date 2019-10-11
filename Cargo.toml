@@ -17,7 +17,7 @@ edition = "2015"
 linkme-impl = { version = "=0.1.6", path = "impl" }
 
 [dev-dependencies]
-rustversion = "0.1"
+rustversion = "1.0"
 trybuild = "1.0"
 
 [workspace]
