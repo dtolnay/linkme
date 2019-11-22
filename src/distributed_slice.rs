@@ -91,10 +91,10 @@ use crate::private::Slice;
 ///   --> src/distributed_slice.rs:65:19
 ///    |
 /// 17 | static BENCH_WTF: usize = 999;
-///    |                   ^^^^^ expected fn pointer, found usize
+///    |                   ^^^^^ expected fn pointer, found `usize`
 ///    |
-///    = note: expected type `fn(&mut other_crate::Bencher)`
-///               found type `usize`
+///    = note: expected fn pointer `fn(&mut other_crate::Bencher)`
+///                     found type `usize`
 /// ```
 pub struct DistributedSlice<T: ?Sized + Slice> {
     start: StaticPtr<T::Element>,
