@@ -24,5 +24,6 @@ matrix:
     - rust: 1.31.0
       script: cargo check
   allow_failures:
-    - rust: nightly
+    - # https://github.com/dtolnay/linkme/issues/23
+      rust: nightly
       name: Cortex-M
