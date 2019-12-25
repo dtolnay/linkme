@@ -21,7 +21,7 @@ linkme-impl = { version = "=0.1.6", path = "impl" }
 
 [dev-dependencies]
 rustversion = "1.0"
-trybuild = "1.0"
+trybuild = { version = "1.0.19", features = ["diff"] }
 
 [workspace]
 members = ["impl", "tests/cortex"]
