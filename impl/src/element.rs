@@ -51,14 +51,16 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
     };
 
     let span = quote!(#ty).into_iter().next().unwrap().span();
-    let uninit = quote_spanned!(span=> #linkme_path::private::value::<#ty>());
+    let uninit = quote_spanned!(span=> __linkme::private::value::<#ty>());
 
     TokenStream::from(quote! {
         #path ! {
             #(#attrs)*
             #vis static #ident : #ty = {
-                unsafe fn __typecheck(_: #linkme_path::private::Void) {
-                    #linkme_path::DistributedSlice::private_typecheck(#path, #uninit)
+                use #linkme_path as __linkme;
+
+                unsafe fn __typecheck(_: __linkme::private::Void) {
+                    __linkme::DistributedSlice::private_typecheck(#path, #uninit)
                 }
 
                 #expr
