@@ -17,6 +17,6 @@ mod usage {
     use crate::link_me::distributed_slice;
 
     #[distributed_slice(super::declaration::SLICE)]
-    #[linkme(crate = "crate::link_me")]
+    #[linkme(crate(crate::link_me))]
     pub static N: i32 = 9;
 }

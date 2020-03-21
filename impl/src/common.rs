@@ -1,7 +1,7 @@
+use syn::ext::IdentExt;
 use syn::parse::{Error, ParseStream, Result};
-use syn::Lit::*;
-use syn::Meta::*;
-use syn::{Attribute, Path};
+use syn::token::Paren;
+use syn::{Attribute, Ident, LitStr, Path, Token};
 
 pub(crate) fn extract_linkme_path(attrs: &mut Vec<Attribute>) -> Result<Path> {
     let mut linkme_path = None;
@@ -10,15 +10,19 @@ pub(crate) fn extract_linkme_path(attrs: &mut Vec<Attribute>) -> Result<Path> {
     attrs.retain(|attr| {
         if attr.path.is_ident("linkme") {
             let res = attr.parse_args_with(|input: ParseStream| -> Result<Path> {
-                match input.parse()? {
-                    NameValue(m) if m.path.is_ident("crate") => match m.lit {
-                        Str(lit) => lit.parse_with(Path::parse_mod_style),
-                        lit => Err(Error::new_spanned(&lit, "expected a string literal")),
-                    },
-                    m => Err(Error::new_spanned(
-                        &m,
-                        "expected `#[linkme(crate = \"path::to::linkme\"]`",
-                    )),
+                let ident = input.call(Ident::parse_any)?;
+                if ident == "crate" {
+                    if input.peek(Paren) {
+                        let content;
+                        syn::parenthesized!(content in input);
+                        content.call(Path::parse_mod_style)
+                    } else {
+                        let _: Token![=] = input.parse()?;
+                        let lit: LitStr = input.parse()?;
+                        lit.parse_with(Path::parse_mod_style)
+                    }
+                } else {
+                    Err(Error::new_spanned(&ident, "unknown parameter"))
                 }
             });
 
