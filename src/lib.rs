@@ -92,7 +92,7 @@
 //! ```
 
 #![no_std]
-#![doc(html_root_url = "https://docs.rs/linkme/0.1.6")]
+#![doc(html_root_url = "https://docs.rs/linkme/0.2.0")]
 
 mod distributed_slice;
 
