@@ -1,6 +1,7 @@
 extern crate proc_macro;
 
 mod args;
+mod common;
 mod declaration;
 mod derive;
 mod element;

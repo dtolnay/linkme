@@ -1,8 +1,10 @@
 use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
+use std::iter::FromIterator;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{Attribute, Ident, Path, Token, Type, Visibility};
-use std::iter::FromIterator;
+
+use crate::common::extract_linkme_path;
 
 pub struct Element {
     attrs: Vec<Attribute>,
@@ -37,21 +39,28 @@ impl Parse for Element {
 }
 
 pub fn expand(path: Path, input: Element) -> TokenStream {
-    let attrs = input.attrs;
+    let mut attrs = input.attrs;
     let vis = input.vis;
     let ident = input.ident;
     let ty = input.ty;
     let expr = input.expr;
 
+    let linkme_path = match extract_linkme_path(&mut attrs) {
+        Ok(path) => path,
+        Err(err) => return err.to_compile_error(),
+    };
+
     let span = quote!(#ty).into_iter().next().unwrap().span();
-    let uninit = quote_spanned!(span=> linkme::private::value::<#ty>());
+    let uninit = quote_spanned!(span=> __linkme::private::value::<#ty>());
 
     TokenStream::from(quote! {
         #path ! {
             #(#attrs)*
             #vis static #ident : #ty = {
-                unsafe fn __typecheck(_: linkme::private::Void) {
-                    linkme::DistributedSlice::private_typecheck(#path, #uninit)
+                use #linkme_path as __linkme;
+
+                unsafe fn __typecheck(_: __linkme::private::Void) {
+                    __linkme::DistributedSlice::private_typecheck(#path, #uninit)
                 }
 
                 #expr

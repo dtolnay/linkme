@@ -3,6 +3,7 @@ use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{bracketed, Attribute, Error, Ident, Token, Type, Visibility};
 
+use crate::common::extract_linkme_path;
 use crate::linker;
 
 struct Declaration {
@@ -47,10 +48,15 @@ pub fn expand(input: TokenStream) -> TokenStream {
         Err(err) => return err.to_compile_error(),
     };
 
-    let attrs = decl.attrs;
+    let mut attrs = decl.attrs;
     let vis = decl.vis;
     let ident = decl.ident;
     let ty = decl.ty;
+
+    let linkme_path = match extract_linkme_path(&mut attrs) {
+        Ok(path) => path,
+        Err(err) => return err.to_compile_error(),
+    };
 
     let linux_section = linker::linux::section(&ident);
     let linux_section_start = linker::linux::section_start(&ident);
@@ -71,16 +77,16 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
     TokenStream::from(quote! {
         #(#attrs)*
-        #vis static #ident: linkme::DistributedSlice<#ty> = {
+        #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
             #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos"))]
             extern "C" {
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_start)]
-                static LINKME_START: <#ty as linkme::private::Slice>::Element;
+                static LINKME_START: <#ty as #linkme_path::private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_stop)]
-                static LINKME_STOP: <#ty as linkme::private::Slice>::Element;
+                static LINKME_STOP: <#ty as #linkme_path::private::Slice>::Element;
             }
 
             #[cfg(target_os = "windows")]
@@ -94,19 +100,19 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg(any(target_os = "none", target_os = "linux"))]
             #[link_section = #linux_section]
             #[used]
-            static LINKME_PLEASE: [<#ty as linkme::private::Slice>::Element; 0] = [];
+            static LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
 
             #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows")))]
             #unsupported_platform
 
             unsafe {
-                linkme::DistributedSlice::private_new(&LINKME_START, &LINKME_STOP)
+                #linkme_path::DistributedSlice::private_new(&LINKME_START, &LINKME_STOP)
             }
         };
 
         #[macro_use]
         mod #link_section_mod_dummy {
-            #[derive(linkme::link_section_macro)]
+            #[derive(#linkme_path::link_section_macro)]
             #[linkme_ident = #ident_str]
             #[linkme_macro = #link_section_macro_dummy_str]
             struct _linkme_macro;
