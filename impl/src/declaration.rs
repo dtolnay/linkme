@@ -1,10 +1,8 @@
+use crate::{attr, linker};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{bracketed, Attribute, Error, Ident, Token, Type, Visibility};
-
-use crate::common::extract_linkme_path;
-use crate::linker;
 
 struct Declaration {
     attrs: Vec<Attribute>,
@@ -53,7 +51,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let ident = decl.ident;
     let ty = decl.ty;
 
-    let linkme_path = match extract_linkme_path(&mut attrs) {
+    let linkme_path = match attr::linkme_path(&mut attrs) {
         Ok(path) => path,
         Err(err) => return err.to_compile_error(),
     };
@@ -72,8 +70,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let ident_str = ident.to_string();
     let link_section_macro_dummy_str = format!("_linkme_macro_{}", ident);
     let link_section_macro_dummy = Ident::new(&link_section_macro_dummy_str, call_site);
-    let link_section_mod_dummy_str = format!("_linkme_module_{}", ident);
-    let link_section_mod_dummy = Ident::new(&link_section_mod_dummy_str, call_site);
+    let link_section_enum_dummy_str = format!("_linkme_generate_{}", ident);
+    let link_section_enum_dummy = Ident::new(&link_section_enum_dummy_str, call_site);
 
     TokenStream::from(quote! {
         #(#attrs)*
@@ -110,12 +108,14 @@ pub fn expand(input: TokenStream) -> TokenStream {
             }
         };
 
-        #[macro_use]
-        mod #link_section_mod_dummy {
-            #[derive(#linkme_path::link_section_macro)]
-            #[linkme_ident = #ident_str]
-            #[linkme_macro = #link_section_macro_dummy_str]
-            struct _linkme_macro;
+        #[doc(hidden)]
+        #vis enum #link_section_macro_dummy {}
+
+        #[doc(hidden)]
+        #[derive(#linkme_path::link_section_macro)]
+        enum #link_section_enum_dummy {
+            _Ident = (#ident_str, 0).1,
+            _Macro = (#link_section_macro_dummy_str, 1).1,
         }
 
         #[doc(hidden)]

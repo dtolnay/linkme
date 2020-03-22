@@ -1,23 +1,55 @@
-use proc_macro2::TokenStream;
-use quote::quote;
-use syn::parse::{ParseStream, Parser, Result};
-use syn::{DeriveInput, Ident, LitStr, Token};
-
 use crate::linker;
+use proc_macro2::{TokenStream, TokenTree};
+use quote::quote;
+use syn::parse::{Parse, ParseStream, Result};
+use syn::{braced, parenthesized, token, Ident, LitStr};
 
-pub fn expand(input: DeriveInput) -> TokenStream {
-    let mut linkme_ident = None;
-    let mut linkme_macro = None;
-    for attr in input.attrs {
-        if attr.path.is_ident("linkme_ident") {
-            linkme_ident = parse_linkme_ident.parse2(attr.tokens).ok();
-        } else if attr.path.is_ident("linkme_macro") {
-            linkme_macro = parse_linkme_ident.parse2(attr.tokens).ok();
+pub struct Enum {
+    linkme_ident: Ident,
+    linkme_macro: Ident,
+}
+
+impl Parse for Enum {
+    fn parse(input: ParseStream) -> Result<Self> {
+        // #[doc(hidden)]
+        // enum #link_section_enum_dummy {
+        //     _Ident = (#linkme_ident, 0).1,
+        //     _Macro = (#linkme_macro, 1).1,
+        // }
+
+        while !input.peek(token::Brace) {
+            input.parse::<TokenTree>()?;
         }
-    }
+        let variants;
+        braced!(variants in input);
 
-    let ident = linkme_ident.expect("attribute linkme_ident");
-    let ident_macro = linkme_macro.expect("attribute linkme_macro");
+        while !variants.peek(token::Paren) {
+            variants.parse::<TokenTree>()?;
+        }
+        let discriminant;
+        parenthesized!(discriminant in variants);
+        let linkme_ident = discriminant.parse::<LitStr>()?.parse::<Ident>()?;
+        discriminant.parse::<TokenStream>()?;
+
+        while !variants.peek(token::Paren) {
+            variants.parse::<TokenTree>()?;
+        }
+        let discriminant;
+        parenthesized!(discriminant in variants);
+        let linkme_macro = discriminant.parse::<LitStr>()?.parse::<Ident>()?;
+        discriminant.parse::<TokenStream>()?;
+        variants.parse::<TokenStream>()?;
+
+        Ok(Enum {
+            linkme_ident,
+            linkme_macro,
+        })
+    }
+}
+
+pub fn expand(input: Enum) -> TokenStream {
+    let ident = input.linkme_ident;
+    let ident_macro = input.linkme_macro;
     let linux_section = linker::linux::section(&ident);
     let macos_section = linker::macos::section(&ident);
     let windows_section = linker::windows::section(&ident);
@@ -35,10 +67,4 @@ pub fn expand(input: DeriveInput) -> TokenStream {
             };
         }
     })
-}
-
-fn parse_linkme_ident(input: ParseStream) -> Result<Ident> {
-    input.parse::<Token![=]>()?;
-    let lit: LitStr = input.parse()?;
-    lit.parse()
 }

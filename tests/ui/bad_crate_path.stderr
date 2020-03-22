@@ -1,0 +1,11 @@
+error[E0433]: failed to resolve: could not find `missing` in `to`
+ --> $DIR/bad_crate_path.rs:8:28
+  |
+8 | #[linkme(crate = path::to::missing)]
+  |                            ^^^^^^^ could not find `missing` in `to`
+
+error[E0433]: failed to resolve: could not find `missing` in `to`
+  --> $DIR/bad_crate_path.rs:15:28
+   |
+15 | #[linkme(crate = path::to::missing)]
+   |                            ^^^^^^^ could not find `missing` in `to`
