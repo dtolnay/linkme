@@ -6,7 +6,7 @@
 
 | Component | Linux | macOS | Windows | Other...<sup>†</sup> |
 |:---|:---:|:---:|:---:|:---:|
-| [Distributed slice] | :heavy\_check\_mark: | :heavy\_check\_mark: | :heavy\_check\_mark: | |
+| [Distributed slice] | ✔️ | ✔️ | ✔️ | |
 
 <b><sup>†</sup></b> We welcome PRs adding support for any platforms not listed
 here.
