@@ -6,6 +6,7 @@ rust:
   - stable
 
 script:
+  - cargo check --manifest-path tests/crate/Cargo.toml
   - cargo test
   - cargo test --release
 
