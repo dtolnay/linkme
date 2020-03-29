@@ -8,4 +8,7 @@ pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
 #[distributed_slice(BENCHMARKS)]
 static BENCH_WTF: usize = 999;
 
+#[distributed_slice(BENCHMARKS)]
+fn wrong_bench_fn<'a>(_: &'a mut ()) {}
+
 fn main() {}
