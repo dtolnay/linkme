@@ -96,6 +96,32 @@ use crate::private::Slice;
 ///    = note: expected fn pointer `fn(&mut other_crate::Bencher)`
 ///                     found type `usize`
 /// ```
+///
+/// ## Function elements
+///
+/// As a shorthand for the common case of distributed slices containing function
+/// pointers, the distributed\_slice attribute may be applied directly to a
+/// function definition to place a pointer to that function into a distributed
+/// slice.
+///
+/// ```
+/// # pub struct Bencher;
+/// #
+/// use linkme::distributed_slice;
+///
+/// #[distributed_slice]
+/// pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+///
+/// // Equivalent to:
+/// //
+/// //    #[distributed_slice(BENCHMARKS)]
+/// //    static _: fn(&mut Bencher) = bench_deserialize;
+/// //
+/// #[distributed_slice(BENCHMARKS)]
+/// fn bench_deserialize(b: &mut Bencher) {
+///     /* ... */
+/// }
+/// ```
 pub struct DistributedSlice<T: ?Sized + Slice> {
     start: StaticPtr<T::Element>,
     stop: StaticPtr<T::Element>,
