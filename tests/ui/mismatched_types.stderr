@@ -11,7 +11,7 @@ error[E0308]: mismatched types
   --> $DIR/mismatched_types.rs:12:1
    |
 12 | fn wrong_bench_fn<'a>(_: &'a mut ()) {}
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected struct `Bencher`, found `()`
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected struct `Bencher`, found `()`
    |
    = note: expected fn pointer `for<'r> fn(&'r mut Bencher)`
               found fn pointer `for<'a> fn(&'a mut ())`

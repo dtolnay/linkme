@@ -1,10 +1,9 @@
 use crate::attr;
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, quote_spanned};
 use std::iter::FromIterator;
 use syn::parse::{Error, Parse, ParseStream, Result};
 use syn::punctuated::Punctuated;
-use syn::spanned::Spanned;
 use syn::{
     braced, parenthesized, parse_quote, Abi, Attribute, BareFnArg, BoundLifetimes, GenericParam,
     Generics, Ident, Path, ReturnType, Token, Type, TypeBareFn, Visibility, WhereClause,
@@ -17,6 +16,8 @@ pub struct Element {
     ty: Type,
     expr: TokenStream,
     orig_item: Option<TokenStream>,
+    start_span: Span,
+    end_span: Span,
 }
 
 impl Parse for Element {
@@ -29,7 +30,9 @@ impl Parse for Element {
         if static_token.is_some() {
             let ident: Ident = input.parse()?;
             input.parse::<Token![:]>()?;
+            let start_span = input.span();
             let ty: Type = input.parse()?;
+            let end_span = quote!(#ty).into_iter().last().unwrap().span();
             input.parse::<Token![=]>()?;
             let mut expr_semi = Vec::from_iter(input.parse::<TokenStream>()?);
             if let Some(tail) = expr_semi.pop() {
@@ -43,6 +46,8 @@ impl Parse for Element {
                 ty,
                 expr,
                 orig_item: None,
+                start_span,
+                end_span,
             })
         } else {
             let constness: Option<Token![const]> = input.parse()?;
@@ -138,6 +143,12 @@ impl Parse for Element {
                 ));
             }
 
+            let start_span = item.span();
+            let end_span = quote!(#output)
+                .into_iter()
+                .last()
+                .as_ref()
+                .map_or(paren_token.span, TokenTree::span);
             let attrs = vec![parse_quote! {
                 #[allow(non_upper_case_globals)]
             }];
@@ -163,6 +174,8 @@ impl Parse for Element {
                 ty,
                 expr,
                 orig_item,
+                start_span,
+                end_span,
             })
         }
     }
@@ -181,12 +194,8 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
         Err(err) => return err.to_compile_error(),
     };
 
-    let span = match orig_item {
-        Some(ref item) => item.span(),
-        None => quote!(#ty).into_iter().next().unwrap().span(),
-    };
-    let new = quote_spanned!(span=> __new);
-    let uninit = quote_spanned!(span=> __new());
+    let new = quote_spanned!(input.start_span=> __new);
+    let uninit = quote_spanned!(input.end_span=> #new());
 
     TokenStream::from(quote! {
         #path ! {
