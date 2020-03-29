@@ -1,10 +1,10 @@
-error: distributed element cannot accept generic parameters
+error: cannot have generic parameters on distributed slice element
  --> $DIR/generic_fn.rs:7:15
   |
 7 | fn type_param<T>() {}
   |               ^
 
-error: distributed element cannot accept generic parameters
+error: cannot have generic parameters on distributed slice element
   --> $DIR/generic_fn.rs:10:16
    |
 10 | fn const_param<const N: usize>() {}
