@@ -1,0 +1,62 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  schedule: [cron: "40 1 * * *"]
+
+jobs:
+  test:
+    name: ${{matrix.name || format('Rust {0}', matrix.rust)}}
+    runs-on: ${{matrix.os}}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [nightly, beta, stable, 1.36.0]
+        os: [ubuntu]
+        include:
+          - name: macOS
+            os: macos
+            rust: nightly
+          - name: Windows (gnu)
+            os: windows
+            rust: nightly-x86_64-pc-windows-gnu
+          - name: Windows (msvc)
+            os: windows
+            rust: nightly-x86_64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust}}
+      - run: cargo check --manifest-path tests/crate/Cargo.toml
+      - run: cargo test
+        # https://github.com/dtolnay/linkme/issues/25
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+      - run: cargo test --release
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+
+  msrv:
+    name: Rust 1.31.0
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@1.31.0
+      - run: cargo check
+
+  cortex:
+    name: Cortex-M
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          target: thumbv7m-none-eabi
+      - name: Install QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-arm
+      - run: cargo run --release
+        working-directory: tests/cortex
+        # https://github.com/dtolnay/linkme/issues/23
+        continue-on-error: true
