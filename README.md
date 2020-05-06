@@ -1,6 +1,6 @@
 ## Linkme: safe cross-platform linker shenanigans
 
-[![Build Status](https://api.travis-ci.com/dtolnay/linkme.svg?branch=master)](https://travis-ci.com/dtolnay/linkme)
+[![Build Status](https://img.shields.io/github/workflow/status/dtolnay/linkme/CI/master)](https://github.com/dtolnay/linkme/actions?query=branch%3Amaster)
 [![Latest Version](https://img.shields.io/crates/v/linkme.svg)](https://crates.io/crates/linkme)
 [![Rust Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/linkme)
 
