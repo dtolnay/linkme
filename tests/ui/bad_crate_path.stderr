@@ -9,3 +9,27 @@ error[E0433]: failed to resolve: could not find `missing` in `to`
    |
 15 | #[linkme(crate = path::to::missing)]
    |                            ^^^^^^^ could not find `missing` in `to`
+
+error[E0433]: failed to resolve: could not find `missing` in `to`
+ --> $DIR/bad_crate_path.rs:7:1
+  |
+7 | #[distributed_slice]
+  | ^^^^^^^^^^^^^^^^^^^^ not found in `path::to::missing`
+  |
+  = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider importing this struct
+  |
+1 | use linkme::DistributedSlice;
+  |
+
+error[E0433]: failed to resolve: could not find `missing` in `to`
+  --> $DIR/bad_crate_path.rs:14:1
+   |
+14 | #[distributed_slice(SLICE2)]
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `path::to::missing`
+   |
+   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider importing this struct
+   |
+1  | use linkme::DistributedSlice;
+   |
