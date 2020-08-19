@@ -223,6 +223,11 @@ impl<T> DistributedSlice<[T]> {
         let len = byte_offset / stride;
         unsafe { slice::from_raw_parts(start, len) }
     }
+
+    /// Returns `true` if `ptr` references a value within the distributed slice.
+    pub fn contains_ptr(this: Self, ptr: *const T) -> bool {
+        this.start.ptr <= ptr && this.stop.ptr > ptr
+    }
 }
 
 impl<T> Copy for DistributedSlice<[T]> {}
