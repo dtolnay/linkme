@@ -1,5 +1,5 @@
 use core::mem;
-use core::ops::Deref;
+use core::ops::{Deref, Range};
 use core::slice;
 
 use crate::private::Slice;
@@ -222,6 +222,14 @@ impl<T> DistributedSlice<[T]> {
         let byte_offset = stop as usize - start as usize;
         let len = byte_offset / stride;
         unsafe { slice::from_raw_parts(start, len) }
+    }
+
+    /// Returns the distributed slice as a range of pointers.
+    pub fn as_ptr_range(this: Self) -> Range<*const T> {
+        Range {
+            start: this.start.ptr,
+            end: this.stop.ptr,
+        }
     }
 }
 
