@@ -181,7 +181,12 @@ impl Parse for Element {
     }
 }
 
-pub fn expand(path: Path, input: Element) -> TokenStream {
+pub fn expand(path: Path, pos: impl Into<Option<usize>>, input: Element) -> TokenStream {
+    let pos = pos.into();
+    do_expand(path, pos, input)
+}
+
+fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
     let mut attrs = input.attrs;
     let vis = input.vis;
     let ident = input.ident;
@@ -194,11 +199,17 @@ pub fn expand(path: Path, input: Element) -> TokenStream {
         Err(err) => return err.to_compile_error(),
     };
 
+    let sort_key = pos.into_iter().map(|pos| format!("{:04}", pos));
+
     let new = quote_spanned!(input.start_span=> __new);
     let uninit = quote_spanned!(input.end_span=> #new());
 
     TokenStream::from(quote! {
         #path ! {
+            #(
+                #![linkme_macro = #path]
+                #![linkme_sort_key = #sort_key]
+            )*
             #(#attrs)*
             #vis static #ident : #ty = {
                 unsafe fn __typecheck(_: #linkme_path::private::Void) {
