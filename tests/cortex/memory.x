@@ -8,4 +8,4 @@ SECTIONS {
   linkme_SHENANIGANS : { *(linkme_SHENANIGANS) } > FLASH
   linkme_EMPTY : { *(linkme_EMPTY) } > FLASH
 }
-INSERT BEFORE .rodata
+INSERT AFTER .rodata
