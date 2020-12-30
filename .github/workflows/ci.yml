@@ -60,3 +60,11 @@ jobs:
         working-directory: tests/cortex
         # https://github.com/dtolnay/linkme/issues/23
         continue-on-error: true
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@clippy
+      - run: cargo clippy -- -Dclippy::all
