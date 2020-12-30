@@ -109,6 +109,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
         };
 
         #[doc(hidden)]
+        #[allow(clippy::empty_enum)]
         #vis enum #link_section_macro_dummy {}
 
         #[doc(hidden)]
