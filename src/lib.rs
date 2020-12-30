@@ -101,6 +101,13 @@
 
 #![no_std]
 #![doc(html_root_url = "https://docs.rs/linkme/0.2.2")]
+#![allow(
+    clippy::doc_markdown,
+    clippy::empty_enum,
+    clippy::expl_impl_clone_on_copy,
+    clippy::must_use_candidate,
+    clippy::unused_self
+)]
 
 mod distributed_slice;
 
