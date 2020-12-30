@@ -204,7 +204,7 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
     let new = quote_spanned!(input.start_span=> __new);
     let uninit = quote_spanned!(input.end_span=> #new());
 
-    TokenStream::from(quote! {
+    quote! {
         #path ! {
             #(
                 #![linkme_macro = #path]
@@ -222,5 +222,5 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
         }
 
         #orig_item
-    })
+    }
 }

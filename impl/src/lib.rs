@@ -1,5 +1,3 @@
-#![allow(clippy::useless_conversion)]
-
 extern crate proc_macro;
 
 mod args;

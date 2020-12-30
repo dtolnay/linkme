@@ -73,7 +73,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let link_section_enum_dummy_str = format!("_linkme_generate_{}", ident);
     let link_section_enum_dummy = Ident::new(&link_section_enum_dummy_str, call_site);
 
-    TokenStream::from(quote! {
+    quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
             #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos"))]
@@ -120,5 +120,5 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
         #[doc(hidden)]
         #vis use #link_section_macro_dummy as #ident;
-    })
+    }
 }

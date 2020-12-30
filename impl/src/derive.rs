@@ -54,7 +54,7 @@ pub fn expand(input: Enum) -> TokenStream {
     let macos_section = linker::macos::section(&ident);
     let windows_section = linker::windows::section(&ident);
 
-    TokenStream::from(quote! {
+    quote! {
         #[doc(hidden)]
         #[macro_export]
         macro_rules! #ident_macro {
@@ -90,5 +90,5 @@ pub fn expand(input: Enum) -> TokenStream {
                 $item
             };
         }
-    })
+    }
 }
