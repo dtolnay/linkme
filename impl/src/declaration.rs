@@ -101,13 +101,9 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[link_section = #windows_section_stop]
             static LINKME_STOP: () = ();
 
-            #[cfg(any(target_os = "none", target_os = "linux"))]
-            #[link_section = #linux_section]
-            #[used]
-            static LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
-
-            #[cfg(target_os = "illumos")]
-            #[link_section = #illumos_section]
+            #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos"))]
+            #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
+            #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[used]
             static LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
 
