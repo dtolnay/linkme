@@ -56,6 +56,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
         Err(err) => return err.to_compile_error(),
     };
 
+    let illumos_section = linker::illumos::section(&ident);
+    let illumos_section_start = linker::illumos::section_start(&ident);
+    let illumos_section_stop = linker::illumos::section_stop(&ident);
+
     let linux_section = linker::linux::section(&ident);
     let linux_section_start = linker::linux::section_start(&ident);
     let linux_section_stop = linker::linux::section_stop(&ident);
@@ -76,13 +80,15 @@ pub fn expand(input: TokenStream) -> TokenStream {
     quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos"))]
+            #[cfg(any(target_os = "none", target_os = "illumos", target_os = "linux", target_os = "macos"))]
             extern "C" {
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
+                #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_start)]
                 static LINKME_START: <#ty as #linkme_path::private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
+                #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_stop)]
                 static LINKME_STOP: <#ty as #linkme_path::private::Slice>::Element;
             }
@@ -100,7 +106,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[used]
             static LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
 
-            #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows")))]
+            #[cfg(target_os = "illumos")]
+            #[link_section = #illumos_section]
+            #[used]
+            static LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
+
+            #[cfg(not(any(target_os = "none", target_os = "illumos", target_os = "linux", target_os = "macos", target_os = "windows")))]
             #unsupported_platform
 
             unsafe {
