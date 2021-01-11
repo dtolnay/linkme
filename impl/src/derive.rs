@@ -51,10 +51,10 @@ pub fn expand(input: Enum) -> TokenStream {
     let ident = input.linkme_ident;
     let ident_macro = input.linkme_macro;
 
-    let illumos_section = linker::illumos::section(&ident);
     let linux_section = linker::linux::section(&ident);
     let macos_section = linker::macos::section(&ident);
     let windows_section = linker::windows::section(&ident);
+    let illumos_section = linker::illumos::section(&ident);
 
     quote! {
         #[doc(hidden)]
@@ -66,33 +66,33 @@ pub fn expand(input: Enum) -> TokenStream {
                 $item:item
             ) => {
                 $macro ! {
-                    #![linkme_illumos_section = concat!(#illumos_section, $key)]
                     #![linkme_linux_section = concat!(#linux_section, $key)]
                     #![linkme_macos_section = concat!(#macos_section, $key)]
                     #![linkme_windows_section = concat!(#windows_section, $key)]
+                    #![linkme_illumos_section = concat!(#illumos_section, $key)]
                     $item
                 }
             };
             (
-                #![linkme_illumos_section = $illumos_section:expr]
                 #![linkme_linux_section = $linux_section:expr]
                 #![linkme_macos_section = $macos_section:expr]
                 #![linkme_windows_section = $windows_section:expr]
+                #![linkme_illumos_section = $illumos_section:expr]
                 $item:item
             ) => {
                 #[used]
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = $linux_section)]
-                #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
                 #[cfg_attr(target_os = "macos", link_section = $macos_section)]
                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
+                #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
                 $item
             };
             ($item:item) => {
                 #[used]
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
-                #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
                 #[cfg_attr(target_os = "macos", link_section = #macos_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
+                #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
                 $item
             };
         }

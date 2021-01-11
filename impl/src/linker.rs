@@ -1,19 +1,3 @@
-pub mod illumos {
-    use syn::Ident;
-
-    pub fn section(ident: &Ident) -> String {
-        format!("set_linkme_{}", ident)
-    }
-
-    pub fn section_start(ident: &Ident) -> String {
-        format!("__start_set_linkme_{}", ident)
-    }
-
-    pub fn section_stop(ident: &Ident) -> String {
-        format!("__stop_set_linkme_{}", ident)
-    }
-}
-
 pub mod linux {
     use syn::Ident;
 
@@ -59,5 +43,21 @@ pub mod windows {
 
     pub fn section_stop(ident: &Ident) -> String {
         format!(".linkme_{}$c", ident)
+    }
+}
+
+pub mod illumos {
+    use syn::Ident;
+
+    pub fn section(ident: &Ident) -> String {
+        format!("set_linkme_{}", ident)
+    }
+
+    pub fn section_start(ident: &Ident) -> String {
+        format!("__start_set_linkme_{}", ident)
+    }
+
+    pub fn section_stop(ident: &Ident) -> String {
+        format!("__stop_set_linkme_{}", ident)
     }
 }
