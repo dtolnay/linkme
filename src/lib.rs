@@ -105,6 +105,7 @@
     clippy::doc_markdown,
     clippy::empty_enum,
     clippy::expl_impl_clone_on_copy,
+    clippy::missing_panics_doc,
     clippy::must_use_candidate,
     clippy::unused_self
 )]
