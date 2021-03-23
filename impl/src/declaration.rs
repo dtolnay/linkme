@@ -105,7 +105,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[used]
-            static LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
+            static mut LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
 
             #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows", target_os = "illumos")))]
             #unsupported_platform
