@@ -132,6 +132,23 @@ fn bench_deserialize(b: &mut Bencher) {
     /* ... */
 }
 ```
+###Renaming and re-exporting
+When renaming or re-exporting the linkme library, the code generated in the macros will
+still reference `::linkme` instead of the new name, requiring projects referencing your
+code to also depend on linkme directly. T avoid that you can use the `#[linkme]` attribute
+to tell linkme to generate code referencing your re-export. 
+
+```rust
+#[my_crate::linkme::distributed_slice]
+#[linkme(crate=my_crate::linkme)] 
+pub static BENCHMARKS: [i32] = [..];
+```
+Due to the way Rust macro expansion works there is no global setting for this, the
+`#[linkme]` attribute must be repeated on every distributed slice element and on the
+declaration.<br>
+Also, note that the `#[linkme]` attribute itself does not have a path. This is because it isn't 
+expanded as macro but consumed by the expansion of the `#[distributed_slice]` macro. 
+Prefixing it with a path will break your build.   
 
 <br>
 
