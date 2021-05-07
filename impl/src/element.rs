@@ -22,7 +22,6 @@ pub struct Element {
 
 impl Parse for Element {
     fn parse(input: ParseStream) -> Result<Self> {
-        let start = input.cursor();
         let attrs = input.call(Attribute::parse_outer)?;
         let item = input.cursor();
         let vis: Visibility = input.parse()?;
@@ -149,8 +148,13 @@ impl Parse for Element {
                 .last()
                 .as_ref()
                 .map_or(paren_token.span, TokenTree::span);
+            let mut original_attrs = attrs;
+            let linkme_path = attr::linkme_path(&mut original_attrs)?;
+
             let attrs = vec![parse_quote! {
                 #[allow(non_upper_case_globals)]
+            }, parse_quote! {
+                #[linkme(crate=#linkme_path)]
             }];
             let vis = Visibility::Inherited;
             let expr = parse_quote!(#ident);
@@ -165,7 +169,11 @@ impl Parse for Element {
                 output,
             });
             let ident = format_ident!("_LINKME_ELEMENT_{}", ident);
-            let orig_item = Some(start.token_stream());
+            let item = item.token_stream();
+            let orig_item = Some(quote!(
+                #(#original_attrs)*
+                #item
+            ));
 
             Ok(Element {
                 attrs,
