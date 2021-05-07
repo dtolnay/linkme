@@ -132,7 +132,7 @@ fn bench_deserialize(b: &mut Bencher) {
     /* ... */
 }
 ```
-###Renaming and re-exporting
+### Renaming and re-exporting
 When renaming or re-exporting the linkme library, the code generated in the macros will
 still reference `::linkme` instead of the new name, requiring projects referencing your
 code to also depend on linkme directly. T avoid that you can use the `#[linkme]` attribute
