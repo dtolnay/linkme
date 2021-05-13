@@ -151,11 +151,14 @@ impl Parse for Element {
             let mut original_attrs = attrs;
             let linkme_path = attr::linkme_path(&mut original_attrs)?;
 
-            let attrs = vec![parse_quote! {
-                #[allow(non_upper_case_globals)]
-            }, parse_quote! {
-                #[linkme(crate=#linkme_path)]
-            }];
+            let attrs = vec![
+                parse_quote! {
+                    #[allow(non_upper_case_globals)]
+                },
+                parse_quote! {
+                    #[linkme(crate = #linkme_path)]
+                },
+            ];
             let vis = Visibility::Inherited;
             let expr = parse_quote!(#ident);
             let ty = Type::BareFn(TypeBareFn {

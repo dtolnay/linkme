@@ -18,5 +18,5 @@ mod usage {
 
     #[distributed_slice(super::declaration::SLICE)]
     #[linkme(crate = crate::link_me)]
-    fn test_me(){}
+    fn test_me() {}
 }
