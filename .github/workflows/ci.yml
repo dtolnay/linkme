@@ -58,6 +58,8 @@ jobs:
           sudo apt-get install -y qemu-system-arm
       - run: cargo run --release
         working-directory: tests/cortex
+        # https://github.com/dtolnay/linkme/issues/40
+        continue-on-error: true
 
   clippy:
     name: Clippy
