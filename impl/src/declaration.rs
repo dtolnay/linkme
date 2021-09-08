@@ -107,7 +107,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[link_section = #windows_section_stop]
             static LINKME_STOP: () = ();
 
-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos"))]
+            #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos", target_os = "freebsd"))]
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
