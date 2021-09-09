@@ -149,7 +149,8 @@ impl<T> DistributedSlice<[T]> {
         target_os = "none",
         target_os = "linux",
         target_os = "macos",
-        target_os = "illumos"
+        target_os = "illumos",
+        target_os = "freebsd"
     ))]
     pub const unsafe fn private_new(start: *const T, stop: *const T) -> Self {
         DistributedSlice {
