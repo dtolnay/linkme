@@ -5,7 +5,6 @@ extern crate proc_macro;
 mod args;
 mod attr;
 mod declaration;
-mod derive;
 mod element;
 mod linker;
 
@@ -24,12 +23,5 @@ pub fn distributed_slice(args: TokenStream, input: TokenStream) -> TokenStream {
         Args::PathPos(path, pos) => element::expand(path, pos, parse_macro_input!(input)),
     };
 
-    TokenStream::from(expanded)
-}
-
-#[doc(hidden)]
-#[proc_macro_derive(link_section_macro, attributes(linkme_ident, linkme_macro))]
-pub fn link_section_macro(input: TokenStream) -> TokenStream {
-    let expanded = derive::expand(parse_macro_input!(input));
     TokenStream::from(expanded)
 }

@@ -1,8 +1,9 @@
-use crate::{attr, linker};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
+use syn::{Attribute, bracketed, Error, Ident, Token, Type, Visibility};
 use syn::parse::{Parse, ParseStream, Result};
-use syn::{bracketed, Attribute, Error, Ident, Token, Type, Visibility};
+
+use crate::{attr, linker};
 
 struct Declaration {
     attrs: Vec<Attribute>,
@@ -71,11 +72,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let illumos_section_stop = linker::illumos::section_stop(&ident);
 
     let call_site = Span::call_site();
-    let ident_str = ident.to_string();
     let link_section_macro_dummy_str = format!("_linkme_macro_{}", ident);
     let link_section_macro_dummy = Ident::new(&link_section_macro_dummy_str, call_site);
-    let link_section_enum_dummy_str = format!("_linkme_generate_{}", ident);
-    let link_section_enum_dummy = Ident::new(&link_section_enum_dummy_str, call_site);
+
+    let declaration_macro = create_declaration_macro(&ident, &link_section_macro_dummy);
 
     quote! {
         #(#attrs)*
@@ -119,14 +119,59 @@ pub fn expand(input: TokenStream) -> TokenStream {
         #[allow(clippy::empty_enum)]
         #vis enum #link_section_macro_dummy {}
 
-        #[doc(hidden)]
-        #[derive(#linkme_path::link_section_macro)]
-        enum #link_section_enum_dummy {
-            _Ident = (#ident_str, 0).1,
-            _Macro = (#link_section_macro_dummy_str, 1).1,
-        }
+        #declaration_macro
 
         #[doc(hidden)]
         #vis use #link_section_macro_dummy as #ident;
+    }
+}
+
+
+fn create_declaration_macro(ident: &Ident, ident_macro: &Ident) -> TokenStream {
+    let linux_section = linker::linux::section(&ident);
+    let macos_section = linker::macos::section(&ident);
+    let windows_section = linker::windows::section(&ident);
+    let illumos_section = linker::illumos::section(&ident);
+
+    quote! {
+        #[doc(hidden)]
+        #[macro_export]
+        macro_rules! #ident_macro {
+            (
+                #![linkme_macro = $macro:path]
+                #![linkme_sort_key = $key:tt]
+                $item:item
+            ) => {
+                $macro ! {
+                    #![linkme_linux_section = concat!(#linux_section, $key)]
+                    #![linkme_macos_section = concat!(#macos_section, $key)]
+                    #![linkme_windows_section = concat!(#windows_section, $key)]
+                    #![linkme_illumos_section = concat!(#illumos_section, $key)]
+                    $item
+                }
+            };
+            (
+                #![linkme_linux_section = $linux_section:expr]
+                #![linkme_macos_section = $macos_section:expr]
+                #![linkme_windows_section = $windows_section:expr]
+                #![linkme_illumos_section = $illumos_section:expr]
+                $item:item
+            ) => {
+                #[used]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = $linux_section)]
+                #[cfg_attr(target_os = "macos", link_section = $macos_section)]
+                #[cfg_attr(target_os = "windows", link_section = $windows_section)]
+                #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
+                $item
+            };
+            ($item:item) => {
+                #[used]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
+                #[cfg_attr(target_os = "macos", link_section = #macos_section)]
+                #[cfg_attr(target_os = "windows", link_section = #windows_section)]
+                #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
+                $item
+            };
+        }
     }
 }
