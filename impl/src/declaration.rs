@@ -1,7 +1,7 @@
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
-use syn::{Attribute, bracketed, Error, Ident, Token, Type, Visibility};
 use syn::parse::{Parse, ParseStream, Result};
+use syn::{bracketed, Attribute, Error, Ident, Token, Type, Visibility};
 
 use crate::{attr, linker};
 
@@ -126,12 +126,11 @@ pub fn expand(input: TokenStream) -> TokenStream {
     }
 }
 
-
 fn create_declaration_macro(ident: &Ident, ident_macro: &Ident) -> TokenStream {
-    let linux_section = linker::linux::section(&ident);
-    let macos_section = linker::macos::section(&ident);
-    let windows_section = linker::windows::section(&ident);
-    let illumos_section = linker::illumos::section(&ident);
+    let linux_section = linker::linux::section(ident);
+    let macos_section = linker::macos::section(ident);
+    let windows_section = linker::windows::section(ident);
+    let illumos_section = linker::illumos::section(ident);
 
     quote! {
         #[doc(hidden)]
