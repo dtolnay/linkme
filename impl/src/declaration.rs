@@ -72,10 +72,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let illumos_section_stop = linker::illumos::section_stop(&ident);
 
     let call_site = Span::call_site();
-    let link_section_macro_dummy_str = format!("_linkme_macro_{}", ident);
-    let link_section_macro_dummy = Ident::new(&link_section_macro_dummy_str, call_site);
+    let link_section_macro_str = format!("_linkme_macro_{}", ident);
+    let link_section_macro = Ident::new(&link_section_macro_str, call_site);
 
-    let declaration_macro = create_declaration_macro(&ident, &link_section_macro_dummy);
+    let declaration_macro = create_declaration_macro(&ident, &link_section_macro);
 
     quote! {
         #(#attrs)*
@@ -115,14 +115,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
             }
         };
 
-        #[doc(hidden)]
-        #[allow(clippy::empty_enum)]
-        #vis enum #link_section_macro_dummy {}
-
         #declaration_macro
 
         #[doc(hidden)]
-        #vis use #link_section_macro_dummy as #ident;
+        #vis use #link_section_macro as #ident;
     }
 }
 
