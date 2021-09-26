@@ -1,4 +1,8 @@
-#![allow(clippy::needless_pass_by_value, clippy::too_many_lines)]
+#![allow(
+    clippy::cast_possible_truncation,
+    clippy::needless_pass_by_value,
+    clippy::too_many_lines
+)]
 
 extern crate proc_macro;
 
