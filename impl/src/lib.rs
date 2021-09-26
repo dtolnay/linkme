@@ -1,4 +1,8 @@
-#![allow(clippy::needless_pass_by_value, clippy::too_many_lines)]
+#![allow(
+    clippy::cast_possible_truncation,
+    clippy::needless_pass_by_value,
+    clippy::too_many_lines
+)]
 
 extern crate proc_macro;
 
@@ -7,12 +11,13 @@ mod attr;
 mod declaration;
 mod derive;
 mod element;
+mod hash;
 mod linker;
 
+use crate::args::Args;
+use crate::hash::hash;
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
-
-use crate::args::Args;
 
 #[proc_macro_attribute]
 pub fn distributed_slice(args: TokenStream, input: TokenStream) -> TokenStream {
