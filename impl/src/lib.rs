@@ -1,5 +1,5 @@
 #![allow(
-    clippy::cast_possible_truncation,
+    clippy::cast_possible_truncation, // https://github.com/rust-lang/rust-clippy/issues/7486
     clippy::needless_pass_by_value,
     clippy::too_many_lines
 )]
