@@ -8,6 +8,7 @@ repository = "https://github.com/dtolnay/linkme"
 documentation = "https://docs.rs/linkme"
 readme = "README.md"
 edition = "2018"
+rust-version = "1.31"
 
 [[test]]
 name = "module_2015"
