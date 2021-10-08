@@ -1,11 +1,11 @@
 error: cannot have generic parameters on distributed slice element
- --> $DIR/tests/ui/generic_fn.rs:7:15
+ --> tests/ui/generic_fn.rs:7:15
   |
 7 | fn type_param<T>() {}
   |               ^
 
 error: cannot have generic parameters on distributed slice element
-  --> $DIR/tests/ui/generic_fn.rs:10:16
+  --> tests/ui/generic_fn.rs:10:16
    |
 10 | fn const_param<const N: usize>() {}
    |                ^^^^^^^^^^^^^^
