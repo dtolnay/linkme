@@ -1,4 +1,5 @@
 #![deny(warnings)]
+#![allow(clippy::no_effect_underscore_binding)]
 
 use linkme::distributed_slice;
 
