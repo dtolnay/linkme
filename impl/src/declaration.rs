@@ -70,6 +70,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let illumos_section_start = linker::illumos::section_start(&ident);
     let illumos_section_stop = linker::illumos::section_stop(&ident);
 
+    let freebsd_section = linker::freebsd::section(&ident);
+    let freebsd_section_start = linker::freebsd::section_start(&ident);
+    let freebsd_section_stop = linker::freebsd::section_stop(&ident);
+
     let call_site = Span::call_site();
     let ident_str = ident.to_string();
     let link_section_macro_dummy_str = format!("_linkme_macro_{}", ident);
@@ -80,16 +84,18 @@ pub fn expand(input: TokenStream) -> TokenStream {
     quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "illumos"))]
+            #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "illumos", target_os = "freebsd"))]
             extern "C" {
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
+                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_start)]
                 static LINKME_START: <#ty as #linkme_path::private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
                 #[cfg_attr(target_os = "macos", link_name = #macos_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
+                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
                 static LINKME_STOP: <#ty as #linkme_path::private::Slice>::Element;
             }
 
@@ -101,13 +107,14 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[link_section = #windows_section_stop]
             static LINKME_STOP: () = ();
 
-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos"))]
+            #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos", target_os = "freebsd"))]
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
+            #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
             #[used]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
 
-            #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows", target_os = "illumos")))]
+            #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows", target_os = "illumos", target_os = "freebsd")))]
             #unsupported_platform
 
             unsafe {

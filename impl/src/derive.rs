@@ -55,6 +55,7 @@ pub fn expand(input: Enum) -> TokenStream {
     let macos_section = linker::macos::section(&ident);
     let windows_section = linker::windows::section(&ident);
     let illumos_section = linker::illumos::section(&ident);
+    let freebsd_section = linker::freebsd::section(&ident);
 
     quote! {
         #[doc(hidden)]
@@ -70,6 +71,7 @@ pub fn expand(input: Enum) -> TokenStream {
                     #![linkme_macos_section = concat!(#macos_section, $key)]
                     #![linkme_windows_section = concat!(#windows_section, $key)]
                     #![linkme_illumos_section = concat!(#illumos_section, $key)]
+                    #![linkme_freebsd_section = concat!(#freebsd_section, $key)]
                     $item
                 }
             };
@@ -78,6 +80,7 @@ pub fn expand(input: Enum) -> TokenStream {
                 #![linkme_macos_section = $macos_section:expr]
                 #![linkme_windows_section = $windows_section:expr]
                 #![linkme_illumos_section = $illumos_section:expr]
+                #![linkme_freebsd_section = $freebsd_section:expr]
                 $item:item
             ) => {
                 #[used]
@@ -85,6 +88,7 @@ pub fn expand(input: Enum) -> TokenStream {
                 #[cfg_attr(target_os = "macos", link_section = $macos_section)]
                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
+                #[cfg_attr(target_os = "freebsd", link_section = $freebsd_section)]
                 $item
             };
             ($item:item) => {
@@ -93,6 +97,7 @@ pub fn expand(input: Enum) -> TokenStream {
                 #[cfg_attr(target_os = "macos", link_section = #macos_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
+                #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
                 $item
             };
         }
