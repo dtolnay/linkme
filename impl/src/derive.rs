@@ -52,7 +52,7 @@ pub fn expand(input: Enum) -> TokenStream {
     let ident_macro = input.linkme_macro;
 
     let linux_section = linker::linux::section(&ident);
-    let macos_section = linker::macos::section(&ident);
+    let macho_section = linker::macho::section(&ident);
     let windows_section = linker::windows::section(&ident);
     let illumos_section = linker::illumos::section(&ident);
     let freebsd_section = linker::freebsd::section(&ident);
@@ -68,7 +68,7 @@ pub fn expand(input: Enum) -> TokenStream {
             ) => {
                 $macro ! {
                     #![linkme_linux_section = concat!(#linux_section, $key)]
-                    #![linkme_macos_section = concat!(#macos_section, $key)]
+                    #![linkme_macho_section = concat!(#macho_section, $key)]
                     #![linkme_windows_section = concat!(#windows_section, $key)]
                     #![linkme_illumos_section = concat!(#illumos_section, $key)]
                     #![linkme_freebsd_section = concat!(#freebsd_section, $key)]
@@ -77,7 +77,7 @@ pub fn expand(input: Enum) -> TokenStream {
             };
             (
                 #![linkme_linux_section = $linux_section:expr]
-                #![linkme_macos_section = $macos_section:expr]
+                #![linkme_macho_section = $macho_section:expr]
                 #![linkme_windows_section = $windows_section:expr]
                 #![linkme_illumos_section = $illumos_section:expr]
                 #![linkme_freebsd_section = $freebsd_section:expr]
@@ -85,7 +85,7 @@ pub fn expand(input: Enum) -> TokenStream {
             ) => {
                 #[used]
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = $linux_section)]
-                #[cfg_attr(target_os = "macos", link_section = $macos_section)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = $macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
                 #[cfg_attr(target_os = "freebsd", link_section = $freebsd_section)]
@@ -94,7 +94,7 @@ pub fn expand(input: Enum) -> TokenStream {
             ($item:item) => {
                 #[used]
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
-                #[cfg_attr(target_os = "macos", link_section = #macos_section)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
                 #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]

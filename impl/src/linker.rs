@@ -30,7 +30,7 @@ pub mod freebsd {
     }
 }
 
-pub mod macos {
+pub mod macho {
     use syn::Ident;
 
     pub fn section(ident: &Ident) -> String {
