@@ -60,8 +60,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let linux_section_start = linker::linux::section_start(&ident);
     let linux_section_stop = linker::linux::section_stop(&ident);
 
-    let macos_section_start = linker::macos::section_start(&ident);
-    let macos_section_stop = linker::macos::section_stop(&ident);
+    let macho_section_start = linker::macho::section_start(&ident);
+    let macho_section_stop = linker::macho::section_stop(&ident);
 
     let windows_section_start = linker::windows::section_start(&ident);
     let windows_section_stop = linker::windows::section_stop(&ident);
@@ -84,16 +84,24 @@ pub fn expand(input: TokenStream) -> TokenStream {
     quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "illumos", target_os = "freebsd"))]
+            #[cfg(any(
+                target_os = "none",
+                target_os = "linux",
+                target_os = "macos",
+                target_os = "ios",
+                target_os = "tvos",
+                target_os = "illumos",
+                target_os = "freebsd",
+            ))]
             extern "C" {
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
-                #[cfg_attr(target_os = "macos", link_name = #macos_section_start)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_start)]
                 static LINKME_START: <#ty as #linkme_path::private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
-                #[cfg_attr(target_os = "macos", link_name = #macos_section_stop)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
                 static LINKME_STOP: <#ty as #linkme_path::private::Slice>::Element;
@@ -114,7 +122,16 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[used]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
 
-            #[cfg(not(any(target_os = "none", target_os = "linux", target_os = "macos", target_os = "windows", target_os = "illumos", target_os = "freebsd")))]
+            #[cfg(not(any(
+                target_os = "none",
+                target_os = "linux",
+                target_os = "macos",
+                target_os = "ios",
+                target_os = "tvos",
+                target_os = "windows",
+                target_os = "illumos",
+                target_os = "freebsd",
+            )))]
             #unsupported_platform
 
             unsafe {
