@@ -34,11 +34,10 @@ jobs:
           toolchain: ${{matrix.rust}}
       - run: cargo check --manifest-path tests/crate/Cargo.toml
       - run: cargo test
-        # macos: https://github.com/dtolnay/linkme/issues/41
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
-        continue-on-error: ${{matrix.os == 'macos' || matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
       - run: cargo test --release
-        continue-on-error: ${{matrix.os == 'macos' || matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
 
   msrv:
     name: Rust 1.31.0

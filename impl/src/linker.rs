@@ -34,7 +34,7 @@ pub mod macos {
     use syn::Ident;
 
     pub fn section(ident: &Ident) -> String {
-        format!("__DATA,__linkme{}", crate::hash(ident))
+        format!("__DATA,__linkme{},regular,no_dead_strip", crate::hash(ident))
     }
 
     pub fn section_start(ident: &Ident) -> String {
