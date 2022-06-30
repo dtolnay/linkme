@@ -1,3 +1,4 @@
+use core::hint;
 use core::mem;
 use core::ops::Deref;
 use core::slice;
@@ -217,18 +218,15 @@ impl<T> DistributedSlice<[T]> {
     /// ```
     pub fn static_slice(self) -> &'static [T] {
         let stride = mem::size_of::<T>();
-
-        if stride == 0 {
-            // We could make this work by storing a 1-byte companion entry in a
-            // different link_section and using that count as the len if anyone
-            // requires this to work, but for now just:
-            return &[];
-        }
-
         let start = self.start.ptr;
         let stop = self.stop.ptr;
         let byte_offset = stop as usize - start as usize;
-        let len = byte_offset / stride;
+        let len = match byte_offset.checked_div(stride) {
+            Some(len) => len,
+            // The #[distributed_slice] call checks `size_of::<T>() > 0` before
+            // using the unsafe `private_new`.
+            None => unsafe { hint::unreachable_unchecked() },
+        };
         unsafe { slice::from_raw_parts(start, len) }
     }
 }
