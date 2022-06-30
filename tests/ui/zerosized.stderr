@@ -1,0 +1,7 @@
+error[E0080]: could not evaluate static initializer
+ --> tests/ui/zerosized.rs:5:1
+  |
+5 | #[distributed_slice]
+  | ^^^^^^^^^^^^^^^^^^^^ the evaluated program panicked at 'assertion failed: ::linkme::private::mem::size_of::<<[Unit] as\n            ::linkme::private::Slice>::Element>() > 0', $DIR/tests/ui/zerosized.rs:5:1
+  |
+  = note: this error originates in the macro `::linkme::private::assert` (in Nightly builds, run with -Z macro-backtrace for more info)

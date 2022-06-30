@@ -134,6 +134,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
             )))]
             #unsupported_platform
 
+            #linkme_path::private::assert!(
+                #linkme_path::private::mem::size_of::<<#ty as #linkme_path::private::Slice>::Element>() > 0,
+            );
+
             unsafe {
                 #linkme_path::DistributedSlice::private_new(&LINKME_START, &LINKME_STOP)
             }
