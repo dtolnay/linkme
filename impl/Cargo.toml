@@ -1,6 +1,6 @@
 [package]
 name = "linkme-impl"
-version = "0.2.10"
+version = "0.3.0"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Implementation detail of the linkme crate"

@@ -16,7 +16,7 @@ here.
 
 ```toml
 [dependencies]
-linkme = "0.2"
+linkme = "0.3"
 ```
 
 *Supports rustc 1.62+*
