@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [nightly, beta, stable, 1.36.0]
+        rust: [nightly, beta, stable, 1.62.0]
         os: [ubuntu]
         include:
           - name: macOS
@@ -38,14 +38,6 @@ jobs:
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
       - run: cargo test --release
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
-
-  msrv:
-    name: Rust 1.31.0
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@1.31.0
-      - run: cargo check
 
   cortex:
     name: Cortex-M
