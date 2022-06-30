@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"
 description = "Implementation detail of the linkme crate"
 repository = "https://github.com/dtolnay/linkme"
 documentation = "https://docs.rs/linkme"
-edition = "2018"
+edition = "2021"
 rust-version = "1.62"
 
 [lib]
