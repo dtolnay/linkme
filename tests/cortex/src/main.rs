@@ -36,7 +36,7 @@ fn main() -> ! {
 
     assert!(EMPTY.is_empty());
 
-    hprintln!("success!").unwrap();
+    hprintln!("success!");
 
     // exit QEMU
     debug::exit(debug::EXIT_SUCCESS);

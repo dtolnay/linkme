@@ -5,8 +5,8 @@ edition = "2018"
 publish = false
 
 [dependencies]
-cortex-m = "0.6"
+cortex-m = "0.7"
 cortex-m-rt = "0.7"
-cortex-m-semihosting = "0.3"
+cortex-m-semihosting = "0.5"
 linkme = { path = "../.." }
-panic-semihosting = { version = "0.5", features = ["exit"] }
+panic-semihosting = { version = "0.6", features = ["exit"] }
