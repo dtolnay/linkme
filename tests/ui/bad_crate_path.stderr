@@ -21,6 +21,10 @@ help: consider importing this struct
   |
 1 | use linkme::DistributedSlice;
   |
+help: if you import `DistributedSlice`, refer to it directly
+  |
+7 - #[distributed_slice]
+  |
 
 error[E0433]: failed to resolve: could not find `missing` in `to`
   --> tests/ui/bad_crate_path.rs:14:1
@@ -32,4 +36,8 @@ error[E0433]: failed to resolve: could not find `missing` in `to`
 help: consider importing this struct
    |
 1  | use linkme::DistributedSlice;
+   |
+help: if you import `DistributedSlice`, refer to it directly
+   |
+14 - #[distributed_slice(SLICE2)]
    |
