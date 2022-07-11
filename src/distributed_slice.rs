@@ -124,8 +124,11 @@ use crate::private::Slice;
 /// }
 /// ```
 pub struct DistributedSlice<T: ?Sized + Slice> {
-    start: StaticPtr<T::Element>,
-    stop: StaticPtr<T::Element>,
+    name: &'static str,
+    section_start: StaticPtr<T::Element>,
+    section_stop: StaticPtr<T::Element>,
+    dupcheck_start: StaticPtr<usize>,
+    dupcheck_stop: StaticPtr<usize>,
 }
 
 struct StaticPtr<T> {
@@ -155,22 +158,46 @@ impl<T> DistributedSlice<[T]> {
         target_os = "illumos",
         target_os = "freebsd"
     ))]
-    pub const unsafe fn private_new(start: *const T, stop: *const T) -> Self {
+    pub const unsafe fn private_new(
+        name: &'static str,
+        section_start: *const T,
+        section_stop: *const T,
+        dupcheck_start: *const usize,
+        dupcheck_stop: *const usize,
+    ) -> Self {
         DistributedSlice {
-            start: StaticPtr { ptr: start },
-            stop: StaticPtr { ptr: stop },
+            name,
+            section_start: StaticPtr { ptr: section_start },
+            section_stop: StaticPtr { ptr: section_stop },
+            dupcheck_start: StaticPtr {
+                ptr: dupcheck_start,
+            },
+            dupcheck_stop: StaticPtr { ptr: dupcheck_stop },
         }
     }
 
     #[doc(hidden)]
     #[cfg(target_os = "windows")]
-    pub const unsafe fn private_new(start: *const (), stop: *const ()) -> Self {
+    pub const unsafe fn private_new(
+        name: &'static str,
+        section_start: *const (),
+        section_stop: *const (),
+        dupcheck_start: *const (),
+        dupcheck_stop: *const (),
+    ) -> Self {
         DistributedSlice {
-            start: StaticPtr {
-                ptr: start as *const T,
+            name,
+            section_start: StaticPtr {
+                ptr: section_start as *const T,
             },
-            stop: StaticPtr {
-                ptr: stop as *const T,
+            section_stop: StaticPtr {
+                ptr: section_stop as *const T,
+            },
+            dupcheck_start: StaticPtr {
+                ptr: dupcheck_start as *const usize,
+            },
+            dupcheck_stop: StaticPtr {
+                ptr: dupcheck_stop as *const usize,
             },
         }
     }
@@ -217,9 +244,13 @@ impl<T> DistributedSlice<[T]> {
     /// }
     /// ```
     pub fn static_slice(self) -> &'static [T] {
+        if self.dupcheck_start.ptr.wrapping_add(1) < self.dupcheck_stop.ptr {
+            panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
+        }
+
         let stride = mem::size_of::<T>();
-        let start = self.start.ptr;
-        let stop = self.stop.ptr;
+        let start = self.section_start.ptr;
+        let stop = self.section_stop.ptr;
         let byte_offset = stop as usize - start as usize;
         let len = match byte_offset.checked_div(stride) {
             Some(len) => len,

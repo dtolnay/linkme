@@ -50,6 +50,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let vis = decl.vis;
     let ident = decl.ident;
     let ty = decl.ty;
+    let name = ident.to_string();
 
     let linkme_path = match attr::linkme_path(&mut attrs) {
         Ok(path) => path,
@@ -59,20 +60,37 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let linux_section = linker::linux::section(&ident);
     let linux_section_start = linker::linux::section_start(&ident);
     let linux_section_stop = linker::linux::section_stop(&ident);
+    let linux_dupcheck = linux_section.replacen("linkme", "linkm2", 1);
+    let linux_dupcheck_start = linux_section_start.replacen("linkme", "linkm2", 1);
+    let linux_dupcheck_stop = linux_section_stop.replacen("linkme", "linkm2", 1);
 
+    let macho_section = linker::macho::section(&ident);
     let macho_section_start = linker::macho::section_start(&ident);
     let macho_section_stop = linker::macho::section_stop(&ident);
+    let macho_dupcheck = macho_section.replacen("linkme", "linkm2", 1);
+    let macho_dupcheck_start = macho_section_start.replacen("linkme", "linkm2", 1);
+    let macho_dupcheck_stop = macho_section_stop.replacen("linkme", "linkm2", 1);
 
+    let windows_section = linker::windows::section(&ident);
     let windows_section_start = linker::windows::section_start(&ident);
     let windows_section_stop = linker::windows::section_stop(&ident);
+    let windows_dupcheck = windows_section.replacen("linkme", "linkm2", 1);
+    let windows_dupcheck_start = windows_section_start.replacen("linkme", "linkm2", 1);
+    let windows_dupcheck_stop = windows_section_stop.replacen("linkme", "linkm2", 1);
 
     let illumos_section = linker::illumos::section(&ident);
     let illumos_section_start = linker::illumos::section_start(&ident);
     let illumos_section_stop = linker::illumos::section_stop(&ident);
+    let illumos_dupcheck = illumos_section.replacen("linkme", "linkm2", 1);
+    let illumos_dupcheck_start = illumos_section_start.replacen("linkme", "linkm2", 1);
+    let illumos_dupcheck_stop = illumos_section_stop.replacen("linkme", "linkm2", 1);
 
     let freebsd_section = linker::freebsd::section(&ident);
     let freebsd_section_start = linker::freebsd::section_start(&ident);
     let freebsd_section_stop = linker::freebsd::section_stop(&ident);
+    let freebsd_dupcheck = freebsd_section.replacen("linkme", "linkm2", 1);
+    let freebsd_dupcheck_start = freebsd_section_start.replacen("linkme", "linkm2", 1);
+    let freebsd_dupcheck_stop = freebsd_section_stop.replacen("linkme", "linkm2", 1);
 
     let call_site = Span::call_site();
     let ident_str = ident.to_string();
@@ -105,6 +123,18 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
                 static LINKME_STOP: <#ty as #linkme_path::private::Slice>::Element;
+
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_start)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
+                #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
+                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_start)]
+                static DUPCHECK_START: #linkme_path::private::usize;
+
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_stop)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
+                #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
+                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_stop)]
+                static DUPCHECK_STOP: #linkme_path::private::usize;
             }
 
             #[cfg(target_os = "windows")]
@@ -115,12 +145,28 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[link_section = #windows_section_stop]
             static LINKME_STOP: () = ();
 
+            #[cfg(target_os = "windows")]
+            #[link_section = #windows_dupcheck_start]
+            static DUPCHECK_START: () = ();
+
+            #[cfg(target_os = "windows")]
+            #[link_section = #windows_dupcheck_stop]
+            static DUPCHECK_STOP: () = ();
+
             #[used]
             #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos", target_os = "freebsd"))]
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
+
+            #[used]
+            #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_dupcheck)]
+            #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_dupcheck)]
+            #[cfg_attr(target_os = "windows", link_section = #windows_dupcheck)]
+            #[cfg_attr(target_os = "illumos", link_section = #illumos_dupcheck)]
+            #[cfg_attr(target_os = "freebsd", link_section = #freebsd_dupcheck)]
+            static DUPCHECK: #linkme_path::private::usize = 1;
 
             #[cfg(not(any(
                 target_os = "none",
@@ -139,7 +185,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
             );
 
             unsafe {
-                #linkme_path::DistributedSlice::private_new(&LINKME_START, &LINKME_STOP)
+                #linkme_path::DistributedSlice::private_new(
+                    #name,
+                    &LINKME_START,
+                    &LINKME_STOP,
+                    &DUPCHECK_START,
+                    &DUPCHECK_STOP,
+                )
             }
         };
 
