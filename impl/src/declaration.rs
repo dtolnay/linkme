@@ -93,7 +93,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
             ))]
-            extern "C" {
+            extern "Rust" {
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
