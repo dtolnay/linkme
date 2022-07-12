@@ -1,5 +1,6 @@
 pub use core::assert;
 pub use core::mem;
+pub use core::primitive::usize;
 
 pub trait Slice {
     type Element;
