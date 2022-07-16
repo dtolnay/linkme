@@ -1,20 +1,4 @@
 error[E0308]: mismatched types
-   --> tests/ui/mismatched_types.rs:12:1
-    |
-11  | #[distributed_slice(BENCHMARKS)]
-    | -------------------------------- arguments to this function are incorrect
-12  | fn wrong_bench_fn<'a>(_: &'a mut ()) {}
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected struct `Bencher`, found `()`
-    |
-    = note: expected fn pointer `for<'r> fn(&'r mut Bencher)`
-               found fn pointer `for<'a> fn(&'a mut ())`
-note: associated function defined here
-   --> src/distributed_slice.rs
-    |
-    |     pub unsafe fn private_typecheck(self, element: T) {
-    |                   ^^^^^^^^^^^^^^^^^
-
-error[E0308]: mismatched types
    --> tests/ui/mismatched_types.rs:9:19
     |
 8   | #[distributed_slice(BENCHMARKS)]
@@ -24,6 +8,22 @@ error[E0308]: mismatched types
     |
     = note: expected fn pointer `for<'r> fn(&'r mut Bencher)`
                      found type `usize`
+note: associated function defined here
+   --> src/distributed_slice.rs
+    |
+    |     pub unsafe fn private_typecheck(self, element: T) {
+    |                   ^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+   --> tests/ui/mismatched_types.rs:12:1
+    |
+11  | #[distributed_slice(BENCHMARKS)]
+    | -------------------------------- arguments to this function are incorrect
+12  | fn wrong_bench_fn<'a>(_: &'a mut ()) {}
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected struct `Bencher`, found `()`
+    |
+    = note: expected fn pointer `for<'r> fn(&'r mut Bencher)`
+               found fn pointer `for<'a> fn(&'a mut ())`
 note: associated function defined here
    --> src/distributed_slice.rs
     |
