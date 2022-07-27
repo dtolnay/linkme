@@ -12,9 +12,9 @@
 //!
 //! # Platform support
 //!
-//! | Component | Linux | macOS | Windows | Other...<sup>†</sup> |
-//! |:---|:---:|:---:|:---:|:---:|
-//! | Distributed slice | 💚 | 💚 | 💚 | |
+//! | Component | Linux | macOS | Windows | FreeBSD | illumos | Other...<sup>†</sup> |
+//! |:---|:---:|:---:|:---:|:---:|:---:|:---:|
+//! | Distributed slice | 💚 | 💚 | 💚 | 💚 | 💚 | |
 //!
 //! <br>***<sup>†</sup>*** We welcome PRs adding support for any platforms not
 //! listed here.
