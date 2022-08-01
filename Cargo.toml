@@ -2,12 +2,12 @@
 name = "linkme"
 version = "0.3.2"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-license = "MIT OR Apache-2.0"
 description = "Safe cross-platform linker shenanigans"
-repository = "https://github.com/dtolnay/linkme"
 documentation = "https://docs.rs/linkme"
-readme = "README.md"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/dtolnay/linkme"
 rust-version = "1.62"
 
 [[test]]

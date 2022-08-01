@@ -2,11 +2,11 @@
 name = "linkme-impl"
 version = "0.3.2"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-license = "MIT OR Apache-2.0"
 description = "Implementation detail of the linkme crate"
-repository = "https://github.com/dtolnay/linkme"
 documentation = "https://docs.rs/linkme"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dtolnay/linkme"
 rust-version = "1.62"
 
 [lib]
