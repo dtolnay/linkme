@@ -6,6 +6,7 @@ categories = ["development-tools::build-utils", "development-tools::procedural-m
 description = "Safe cross-platform linker shenanigans"
 documentation = "https://docs.rs/linkme"
 edition = "2021"
+keywords = ["linkage"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/dtolnay/linkme"
