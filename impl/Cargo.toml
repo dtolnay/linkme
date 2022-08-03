@@ -1,6 +1,6 @@
 [package]
 name = "linkme-impl"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 description = "Implementation detail of the linkme crate"
 documentation = "https://docs.rs/linkme"
