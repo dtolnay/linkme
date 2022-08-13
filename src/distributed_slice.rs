@@ -3,7 +3,7 @@ use core::mem;
 use core::ops::Deref;
 use core::slice;
 
-use crate::private::Slice;
+use crate::__private::Slice;
 
 /// Collection of static elements that are gathered into a contiguous section of
 /// the binary by the linker.

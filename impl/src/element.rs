@@ -223,8 +223,8 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
             )*
             #(#attrs)*
             #vis static #ident : #ty = {
-                unsafe fn __typecheck(_: #linkme_path::private::Void) {
-                    let #new = #linkme_path::private::value::<#ty>;
+                unsafe fn __typecheck(_: #linkme_path::__private::Void) {
+                    let #new = #linkme_path::__private::value::<#ty>;
                     #linkme_path::DistributedSlice::private_typecheck(#path, #uninit)
                 }
 

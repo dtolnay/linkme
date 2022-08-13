@@ -113,8 +113,10 @@
 
 mod distributed_slice;
 
+// Not public API.
 #[doc(hidden)]
-pub mod private;
+#[path = "private.rs"]
+pub mod __private;
 
 pub use linkme_impl::*;
 

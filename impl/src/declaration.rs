@@ -116,25 +116,25 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_start)]
-                static LINKME_START: <#ty as #linkme_path::private::Slice>::Element;
+                static LINKME_START: <#ty as #linkme_path::__private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_section_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
-                static LINKME_STOP: <#ty as #linkme_path::private::Slice>::Element;
+                static LINKME_STOP: <#ty as #linkme_path::__private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_start)]
-                static DUPCHECK_START: #linkme_path::private::usize;
+                static DUPCHECK_START: #linkme_path::__private::usize;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_name = #linux_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_stop)]
-                static DUPCHECK_STOP: #linkme_path::private::usize;
+                static DUPCHECK_STOP: #linkme_path::__private::usize;
             }
 
             #[cfg(target_os = "windows")]
@@ -158,7 +158,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
-            static mut LINKME_PLEASE: [<#ty as #linkme_path::private::Slice>::Element; 0] = [];
+            static mut LINKME_PLEASE: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
 
             #[used]
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_dupcheck)]
@@ -166,7 +166,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg_attr(target_os = "windows", link_section = #windows_dupcheck)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_dupcheck)]
             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_dupcheck)]
-            static DUPCHECK: #linkme_path::private::usize = 1;
+            static DUPCHECK: #linkme_path::__private::usize = 1;
 
             #[cfg(not(any(
                 target_os = "none",
@@ -180,8 +180,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
             )))]
             #unsupported_platform
 
-            #linkme_path::private::assert!(
-                #linkme_path::private::mem::size_of::<<#ty as #linkme_path::private::Slice>::Element>() > 0,
+            #linkme_path::__private::assert!(
+                #linkme_path::__private::mem::size_of::<<#ty as #linkme_path::__private::Slice>::Element>() > 0,
             );
 
             unsafe {
