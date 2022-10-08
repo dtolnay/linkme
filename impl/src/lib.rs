@@ -1,7 +1,8 @@
 #![allow(
     clippy::cast_possible_truncation, // https://github.com/rust-lang/rust-clippy/issues/7486
     clippy::needless_pass_by_value,
-    clippy::too_many_lines
+    clippy::too_many_lines,
+    clippy::uninlined_format_args,
 )]
 
 extern crate proc_macro;
