@@ -96,8 +96,6 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let link_section_macro_str = format!("_linkme_macro_{}", ident);
     let link_section_macro = Ident::new(&link_section_macro_str, call_site);
 
-    let declaration_macro = create_declaration_macro(&ident, &link_section_macro);
-
     quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
@@ -194,24 +192,9 @@ pub fn expand(input: TokenStream) -> TokenStream {
             }
         };
 
-        #declaration_macro
-
-        #[doc(hidden)]
-        #vis use #link_section_macro as #ident;
-    }
-}
-
-fn create_declaration_macro(ident: &Ident, ident_macro: &Ident) -> TokenStream {
-    let linux_section = linker::linux::section(ident);
-    let macho_section = linker::macho::section(ident);
-    let windows_section = linker::windows::section(ident);
-    let illumos_section = linker::illumos::section(ident);
-    let freebsd_section = linker::freebsd::section(ident);
-
-    quote! {
         #[doc(hidden)]
         #[macro_export]
-        macro_rules! #ident_macro {
+        macro_rules! #link_section_macro {
             (
                 #![linkme_macro = $macro:path]
                 #![linkme_sort_key = $key:tt]
@@ -252,5 +235,8 @@ fn create_declaration_macro(ident: &Ident, ident_macro: &Ident) -> TokenStream {
                 $item
             };
         }
+
+        #[doc(hidden)]
+        #vis use #link_section_macro as #ident;
     }
 }
