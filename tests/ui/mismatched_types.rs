@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "used_linker", feature(used_with_arg))]
+
 use linkme::distributed_slice;
 
 pub struct Bencher;

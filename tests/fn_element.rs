@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "used_linker", feature(used_with_arg))]
 #![allow(clippy::needless_lifetimes, clippy::trivially_copy_pass_by_ref)]
 
 use linkme::distributed_slice;

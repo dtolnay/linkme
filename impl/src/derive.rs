@@ -51,6 +51,12 @@ pub fn expand(input: Enum) -> TokenStream {
     let ident = input.linkme_ident;
     let ident_macro = input.linkme_macro;
 
+    let used = if cfg!(feature = "used_linker") {
+        quote!(#[used(linker)])
+    } else {
+        quote!(#[used])
+    };
+
     let linux_section = linker::linux::section(&ident);
     let macho_section = linker::macho::section(&ident);
     let windows_section = linker::windows::section(&ident);
@@ -83,7 +89,7 @@ pub fn expand(input: Enum) -> TokenStream {
                 #![linkme_freebsd_section = $freebsd_section:expr]
                 $item:item
             ) => {
-                #[used]
+                #used
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = $linux_section)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = $macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
@@ -92,7 +98,7 @@ pub fn expand(input: Enum) -> TokenStream {
                 $item
             };
             ($item:item) => {
-                #[used]
+                #used
                 #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
