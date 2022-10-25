@@ -93,11 +93,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let freebsd_dupcheck_stop = freebsd_section_stop.replacen("linkme", "linkm2", 1);
 
     let call_site = Span::call_site();
-    let ident_str = ident.to_string();
-    let link_section_macro_dummy_str = format!("_linkme_macro_{}", ident);
-    let link_section_macro_dummy = Ident::new(&link_section_macro_dummy_str, call_site);
-    let link_section_enum_dummy_str = format!("_linkme_generate_{}", ident);
-    let link_section_enum_dummy = Ident::new(&link_section_enum_dummy_str, call_site);
+    let link_section_macro_str = format!("_linkme_macro_{}", ident);
+    let link_section_macro = Ident::new(&link_section_macro_str, call_site);
+
+    let declaration_macro = create_declaration_macro(&ident, &link_section_macro);
 
     quote! {
         #(#attrs)*
@@ -195,18 +194,63 @@ pub fn expand(input: TokenStream) -> TokenStream {
             }
         };
 
-        #[doc(hidden)]
-        #[allow(clippy::empty_enum)]
-        #vis enum #link_section_macro_dummy {}
+        #declaration_macro
 
         #[doc(hidden)]
-        #[derive(#linkme_path::link_section_macro)]
-        enum #link_section_enum_dummy {
-            _Ident = (#ident_str, 0).1,
-            _Macro = (#link_section_macro_dummy_str, 1).1,
+        #vis use #link_section_macro as #ident;
+    }
+}
+
+fn create_declaration_macro(ident: &Ident, ident_macro: &Ident) -> TokenStream {
+    let linux_section = linker::linux::section(ident);
+    let macho_section = linker::macho::section(ident);
+    let windows_section = linker::windows::section(ident);
+    let illumos_section = linker::illumos::section(ident);
+    let freebsd_section = linker::freebsd::section(ident);
+
+    quote! {
+        #[doc(hidden)]
+        #[macro_export]
+        macro_rules! #ident_macro {
+            (
+                #![linkme_macro = $macro:path]
+                #![linkme_sort_key = $key:tt]
+                $item:item
+            ) => {
+                $macro ! {
+                    #![linkme_linux_section = concat!(#linux_section, $key)]
+                    #![linkme_macho_section = concat!(#macho_section, $key)]
+                    #![linkme_windows_section = concat!(#windows_section, $key)]
+                    #![linkme_illumos_section = concat!(#illumos_section, $key)]
+                    #![linkme_freebsd_section = concat!(#freebsd_section, $key)]
+                    $item
+                }
+            };
+            (
+                #![linkme_linux_section = $linux_section:expr]
+                #![linkme_macho_section = $macho_section:expr]
+                #![linkme_windows_section = $windows_section:expr]
+                #![linkme_illumos_section = $illumos_section:expr]
+                #![linkme_freebsd_section = $freebsd_section:expr]
+                $item:item
+            ) => {
+                #[used]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = $linux_section)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = $macho_section)]
+                #[cfg_attr(target_os = "windows", link_section = $windows_section)]
+                #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
+                #[cfg_attr(target_os = "freebsd", link_section = $freebsd_section)]
+                $item
+            };
+            ($item:item) => {
+                #[used]
+                #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
+                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_section)]
+                #[cfg_attr(target_os = "windows", link_section = #windows_section)]
+                #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
+                #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
+                $item
+            };
         }
-
-        #[doc(hidden)]
-        #vis use #link_section_macro_dummy as #ident;
     }
 }
