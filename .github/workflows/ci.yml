@@ -58,9 +58,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-system-arm
       - run: cargo run --release
+        env:
+          RUSTFLAGS: -C link-arg=-Tlink.x -D warnings
         working-directory: tests/cortex
         continue-on-error: true
       - run: cargo run --release --features used_linker
+        env:
+          RUSTFLAGS: -C link-arg=-Tlink.x -D warnings
         working-directory: tests/cortex
 
   clippy:
