@@ -57,6 +57,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
         Err(err) => return err.to_compile_error(),
     };
 
+    let used = if cfg!(feature = "used_linker") {
+        quote!(#[used(linker)])
+    } else {
+        quote!(#[used])
+    };
+
     let linux_section = linker::linux::section(&ident);
     let linux_section_start = linker::linux::section_start(&ident);
     let linux_section_stop = linker::linux::section_stop(&ident);
@@ -150,14 +156,14 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[link_section = #windows_dupcheck_stop]
             static DUPCHECK_STOP: () = ();
 
-            #[used]
+            #used
             #[cfg(any(target_os = "none", target_os = "linux", target_os = "illumos", target_os = "freebsd"))]
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
 
-            #[used]
+            #used
             #[cfg_attr(any(target_os = "none", target_os = "linux"), link_section = #linux_dupcheck)]
             #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_dupcheck)]
             #[cfg_attr(target_os = "windows", link_section = #windows_dupcheck)]
