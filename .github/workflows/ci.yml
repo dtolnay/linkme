@@ -40,10 +40,12 @@ jobs:
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
       - run: cargo test --features used_linker
         if: startsWith(matrix.rust, 'nightly')
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
       - run: cargo test --release
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
       - run: cargo test --release --features used_linker
         if: startsWith(matrix.rust, 'nightly')
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
 
   cortex:
     name: Cortex-M
