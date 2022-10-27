@@ -5,6 +5,9 @@ authors = ["David Tolnay <dtolnay@gmail.com>"]
 edition = "2021"
 publish = false
 
+[features]
+used_linker = ["linkme/used_linker"]
+
 [dependencies]
 cortex-m = "0.7"
 cortex-m-rt = "0.7"

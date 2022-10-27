@@ -39,7 +39,13 @@ jobs:
       - run: cargo test
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+      - run: cargo test --features used_linker
+        if: startsWith(matrix.rust, 'nightly')
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
       - run: cargo test --release
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+      - run: cargo test --release --features used_linker
+        if: startsWith(matrix.rust, 'nightly')
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
 
   cortex:
@@ -55,9 +61,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-system-arm
       - run: cargo run --release
+        env:
+          RUSTFLAGS: -C link-arg=-Tlink.x -D warnings
         working-directory: tests/cortex
-        # https://github.com/dtolnay/linkme/issues/40
         continue-on-error: true
+      - run: cargo run --release --features used_linker
+        env:
+          RUSTFLAGS: -C link-arg=-Tlink.x -D warnings
+        working-directory: tests/cortex
 
   clippy:
     name: Clippy

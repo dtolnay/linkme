@@ -12,6 +12,9 @@ rust-version = "1.62"
 [lib]
 proc-macro = true
 
+[features]
+used_linker = []
+
 [dependencies]
 proc-macro2 = "1.0.2"
 quote = "1.0"

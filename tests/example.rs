@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "used_linker", feature(used_with_arg))]
 #![deny(warnings)]
 #![allow(clippy::no_effect_underscore_binding)]
 
