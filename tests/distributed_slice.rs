@@ -59,3 +59,14 @@ fn test_interior_mutable() {
     assert!(MUTABLE.len() == 1);
     assert!(*MUTABLE[0] == -1);
 }
+
+#[test]
+fn test_elided_lifetime() {
+    #[distributed_slice]
+    pub static MYSLICE: [&str] = [..];
+
+    #[distributed_slice(MYSLICE)]
+    static ELEMENT: &str = "...";
+
+    assert!(!MYSLICE.is_empty());
+}
