@@ -16,6 +16,13 @@ impl Parse for Declaration {
         let attrs = input.call(Attribute::parse_outer)?;
         let vis: Visibility = input.parse()?;
         input.parse::<Token![static]>()?;
+        let mut_token: Option<Token![mut]> = input.parse()?;
+        if let Some(mut_token) = mut_token {
+            return Err(Error::new_spanned(
+                mut_token,
+                "static mut is not supported by distributed_slice",
+            ));
+        }
         let ident: Ident = input.parse()?;
         input.parse::<Token![:]>()?;
         let ty: Type = input.parse()?;
