@@ -1,5 +1,0 @@
-error[E0106]: missing lifetime specifier
- --> tests/ui/static_elision.rs:6:22
-  |
-6 | pub static MYSLICE: [&str] = [..];
-  |                      ^ expected named lifetime parameter

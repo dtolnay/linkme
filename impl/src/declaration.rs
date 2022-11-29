@@ -2,7 +2,10 @@ use crate::{attr, linker};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
-use syn::{bracketed, Attribute, Error, Ident, Token, Type, Visibility};
+use syn::{
+    bracketed, Attribute, Error, GenericArgument, Ident, Lifetime, PathArguments, Token, Type,
+    Visibility,
+};
 
 struct Declaration {
     attrs: Vec<Attribute>,
@@ -56,13 +59,15 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let mut attrs = decl.attrs;
     let vis = decl.vis;
     let ident = decl.ident;
-    let ty = decl.ty;
+    let mut ty = decl.ty;
     let name = ident.to_string();
 
     let linkme_path = match attr::linkme_path(&mut attrs) {
         Ok(path) => path,
         Err(err) => return err.to_compile_error(),
     };
+
+    populate_static_lifetimes(&mut ty);
 
     let used = if cfg!(feature = "used_linker") {
         quote!(#[used(linker)])
@@ -251,5 +256,45 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
         #[doc(hidden)]
         #vis use #link_section_macro as #ident;
+    }
+}
+
+fn populate_static_lifetimes(ty: &mut Type) {
+    match ty {
+        Type::Array(ty) => populate_static_lifetimes(&mut ty.elem),
+        Type::Group(ty) => populate_static_lifetimes(&mut ty.elem),
+        Type::Paren(ty) => populate_static_lifetimes(&mut ty.elem),
+        Type::Path(ty) => {
+            if let Some(qself) = &mut ty.qself {
+                populate_static_lifetimes(&mut qself.ty);
+            }
+            for segment in &mut ty.path.segments {
+                if let PathArguments::AngleBracketed(segment) = &mut segment.arguments {
+                    for arg in &mut segment.args {
+                        if let GenericArgument::Type(arg) = arg {
+                            populate_static_lifetimes(arg);
+                        }
+                    }
+                }
+            }
+        }
+        Type::Ptr(ty) => populate_static_lifetimes(&mut ty.elem),
+        Type::Reference(ty) => {
+            if ty.lifetime.is_none() {
+                ty.lifetime = Some(Lifetime::new("'static", ty.and_token.span));
+            }
+            populate_static_lifetimes(&mut ty.elem);
+        }
+        Type::Slice(ty) => populate_static_lifetimes(&mut ty.elem),
+        Type::Tuple(ty) => ty.elems.iter_mut().for_each(populate_static_lifetimes),
+        Type::ImplTrait(_)
+        | Type::Infer(_)
+        | Type::Macro(_)
+        | Type::Never(_)
+        | Type::TraitObject(_)
+        | Type::BareFn(_)
+        | Type::Verbatim(_) => {}
+        #[cfg_attr(all(test, exhaustive), deny(non_exhaustive_omitted_patterns))]
+        _ => unimplemented!("unknown Type"),
     }
 }

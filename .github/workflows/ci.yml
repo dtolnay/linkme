@@ -30,6 +30,8 @@ jobs:
           - name: Windows (msvc)
             os: windows
             rust: nightly-x86_64-pc-windows-msvc
+    env:
+      RUSTFLAGS: ${{env.RUSTFLAGS}} ${{startsWith(matrix.rust, 'nightly') && '--cfg exhaustive' || ''}}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v3
