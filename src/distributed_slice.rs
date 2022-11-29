@@ -186,8 +186,8 @@ impl<T> DistributedSlice<[T]> {
     #[cfg(target_os = "windows")]
     pub const unsafe fn private_new(
         name: &'static str,
-        section_start: *const (),
-        section_stop: *const (),
+        section_start: *const [T; 0],
+        section_stop: *const [T; 0],
         dupcheck_start: *const (),
         dupcheck_stop: *const (),
     ) -> Self {

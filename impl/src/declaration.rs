@@ -149,11 +149,11 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
             #[cfg(target_os = "windows")]
             #[link_section = #windows_section_start]
-            static LINKME_START: () = ();
+            static LINKME_START: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
 
             #[cfg(target_os = "windows")]
             #[link_section = #windows_section_stop]
-            static LINKME_STOP: () = ();
+            static LINKME_STOP: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
 
             #[cfg(target_os = "windows")]
             #[link_section = #windows_dupcheck_start]
