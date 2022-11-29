@@ -27,6 +27,13 @@ impl Parse for Element {
         let vis: Visibility = input.parse()?;
         let static_token: Option<Token![static]> = input.parse()?;
         if static_token.is_some() {
+            let mut_token: Option<Token![mut]> = input.parse()?;
+            if let Some(mut_token) = mut_token {
+                return Err(Error::new_spanned(
+                    mut_token,
+                    "static mut is not supported by distributed_slice",
+                ));
+            }
             let ident: Ident = input.parse()?;
             input.parse::<Token![:]>()?;
             let start_span = input.span();
