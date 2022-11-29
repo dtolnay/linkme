@@ -1,6 +1,7 @@
 #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
 
 use linkme::distributed_slice;
+use once_cell::sync::Lazy;
 
 #[distributed_slice]
 static SHENANIGANS: [i32] = [..];
@@ -45,4 +46,16 @@ fn test_non_copy() {
     static ELEMENT: NonCopy = NonCopy(9);
 
     assert!(!NONCOPY.is_empty());
+}
+
+#[test]
+fn test_interior_mutable() {
+    #[distributed_slice]
+    static MUTABLE: [Lazy<i32>] = [..];
+
+    #[distributed_slice(MUTABLE)]
+    static ELEMENT: Lazy<i32> = Lazy::new(|| -1);
+
+    assert!(MUTABLE.len() == 1);
+    assert!(*MUTABLE[0] == -1);
 }
