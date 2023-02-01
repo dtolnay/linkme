@@ -20,7 +20,7 @@ error[E0308]: mismatched types
 13 | #[distributed_slice(BENCHMARKS)]
    | -------------------------------- arguments to this function are incorrect
 14 | fn wrong_bench_fn<'a>(_: &'a mut ()) {}
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected struct `Bencher`, found `()`
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Bencher`, found `()`
    |
    = note: expected fn pointer `for<'a> fn(&'a mut Bencher)`
               found fn pointer `for<'a> fn(&'a mut ())`
