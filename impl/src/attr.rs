@@ -1,5 +1,5 @@
-use syn::parse::{Error, ParseStream, Result};
-use syn::{parse_quote, Attribute, Path, Token};
+use syn::parse::{Error, Result};
+use syn::{parse_quote, Attribute, Path};
 
 // #[linkme(crate = path::to::linkme)]
 pub(crate) fn linkme_path(attrs: &mut Vec<Attribute>) -> Result<Path> {
@@ -7,19 +7,25 @@ pub(crate) fn linkme_path(attrs: &mut Vec<Attribute>) -> Result<Path> {
     let mut errors: Option<Error> = None;
 
     attrs.retain(|attr| {
-        if !attr.path.is_ident("linkme") {
+        if !attr.path().is_ident("linkme") {
             return true;
         }
-        match attr.parse_args_with(|input: ParseStream| {
-            input.parse::<Token![crate]>()?;
-            input.parse::<Token![=]>()?;
-            input.call(Path::parse_mod_style)
+        if let Err(err) = attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident("crate") {
+                if linkme_path.is_some() {
+                    return Err(meta.error("duplicate linkme crate attribute"));
+                }
+                let path = meta.value()?.call(Path::parse_mod_style)?;
+                linkme_path = Some(path);
+                Ok(())
+            } else {
+                Err(meta.error("unsupported linkme attribute"))
+            }
         }) {
-            Ok(path) => linkme_path = Some(path),
-            Err(err) => match &mut errors {
+            match &mut errors {
                 None => errors = Some(err),
                 Some(errors) => errors.combine(err),
-            },
+            }
         }
         false
     });
