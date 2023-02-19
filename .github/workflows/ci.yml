@@ -45,6 +45,9 @@ jobs:
       - name: Enable deny(non_exhaustive_omitted_patterns)
         run: echo RUSTFLAGS=${RUSTFLAGS}\ --cfg=exhaustive >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
+      - name: Enable type layout randomization
+        run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zrandomize-layout >> $GITHUB_ENV
+        if: matrix.rust == 'nightly'
       - run: cargo check --manifest-path tests/crate/Cargo.toml
       - run: cargo test -p linkme -p linkme-impl
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
