@@ -45,15 +45,15 @@ jobs:
         with:
           toolchain: ${{matrix.rust}}
       - run: cargo check --manifest-path tests/crate/Cargo.toml
-      - run: cargo test
+      - run: cargo test -p linkme -p linkme-impl
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
-      - run: cargo test --features used_linker
+      - run: cargo test -p linkme -p linkme-impl --features used_linker
         if: startsWith(matrix.rust, 'nightly')
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
-      - run: cargo test --release
+      - run: cargo test -p linkme -p linkme-impl --release
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
-      - run: cargo test --release --features used_linker
+      - run: cargo test -p linkme -p linkme-impl --release --features used_linker
         if: startsWith(matrix.rust, 'nightly')
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
 
