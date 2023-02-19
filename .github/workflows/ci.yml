@@ -36,14 +36,15 @@ jobs:
           - name: Windows (msvc)
             os: windows
             rust: nightly-x86_64-pc-windows-msvc
-    env:
-      RUSTFLAGS: ${{startsWith(matrix.rust, 'nightly') && '--cfg exhaustive' || ''}} -Dwarnings
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust}}
+      - name: Enable deny(non_exhaustive_omitted_patterns)
+        run: echo RUSTFLAGS=${RUSTFLAGS}\ --cfg=exhaustive >> $GITHUB_ENV
+        if: matrix.rust == 'nightly'
       - run: cargo check --manifest-path tests/crate/Cargo.toml
       - run: cargo test -p linkme -p linkme-impl
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
