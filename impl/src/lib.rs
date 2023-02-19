@@ -1,3 +1,4 @@
+#![cfg_attr(all(test, exhaustive), feature(non_exhaustive_omitted_patterns_lint))]
 #![allow(
     clippy::cast_possible_truncation, // https://github.com/rust-lang/rust-clippy/issues/7486
     clippy::needless_pass_by_value,
