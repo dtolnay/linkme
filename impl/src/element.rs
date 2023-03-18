@@ -124,19 +124,16 @@ impl Parse for Element {
                 };
                 for param in generics.params.into_pairs() {
                     let (param, punct) = param.into_tuple();
-                    match param {
-                        GenericParam::Lifetime(lifetime) => {
-                            bound.lifetimes.push_value(lifetime);
-                            if let Some(punct) = punct {
-                                bound.lifetimes.push_punct(punct);
-                            }
+                    if let GenericParam::Lifetime(_) = param {
+                        bound.lifetimes.push_value(param);
+                        if let Some(punct) = punct {
+                            bound.lifetimes.push_punct(punct);
                         }
-                        _ => {
-                            return Err(Error::new_spanned(
-                                param,
-                                "cannot have generic parameters on distributed slice element",
-                            ))
-                        }
+                    } else {
+                        return Err(Error::new_spanned(
+                            param,
+                            "cannot have generic parameters on distributed slice element",
+                        ));
                     }
                 }
                 Some(bound)
@@ -154,7 +151,7 @@ impl Parse for Element {
                 .into_iter()
                 .last()
                 .as_ref()
-                .map_or(paren_token.span, TokenTree::span);
+                .map_or(paren_token.span.close(), TokenTree::span);
             let mut original_attrs = attrs;
             let linkme_path = attr::linkme_path(&mut original_attrs)?;
 
