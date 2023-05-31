@@ -161,6 +161,7 @@ impl<T> DistributedSlice<[T]> {
         target_os = "macos",
         target_os = "ios",
         target_os = "tvos",
+        target_os = "android",
         target_os = "illumos",
         target_os = "freebsd"
     ))]
