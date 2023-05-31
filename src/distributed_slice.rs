@@ -156,6 +156,7 @@ impl<T> Clone for StaticPtr<T> {
 impl<T> DistributedSlice<[T]> {
     #[doc(hidden)]
     #[cfg(any(
+        target_os = "android",
         target_os = "none",
         target_os = "linux",
         target_os = "macos",
