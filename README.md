@@ -5,9 +5,9 @@
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-linkme-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/linkme)
 [<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/dtolnay/linkme/ci.yml?branch=master&style=for-the-badge" height="20">](https://github.com/dtolnay/linkme/actions?query=branch%3Amaster)
 
-| Component | Linux | macOS | Windows | FreeBSD | illumos | Other...<sup>†</sup> |
+| Component | Linux | macOS | Windows | FreeBSD | illumos | Android | Other...<sup>†</sup> |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| [Distributed slice] | 💚 | 💚 | 💚 | 💚 | 💚 | |
+| [Distributed slice] | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | |
 
 <b><sup>†</sup></b> We welcome PRs adding support for any platforms not listed
 here.
