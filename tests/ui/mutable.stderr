@@ -1,11 +1,19 @@
 error: static mut is not supported by distributed_slice
  --> tests/ui/mutable.rs:6:12
   |
+5 | #[distributed_slice]
+  | -------------------- in this procedural macro expansion
 6 | pub static mut SLICE: [i32] = [..];
   |            ^^^
+  |
+  = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: static mut is not supported by distributed_slice
  --> tests/ui/mutable.rs:9:8
   |
+8 | #[distributed_slice(BENCHMARKS)]
+  | -------------------------------- in this procedural macro expansion
 9 | static mut ELEMENT: i32 = -1;
   |        ^^^
+  |
+  = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)

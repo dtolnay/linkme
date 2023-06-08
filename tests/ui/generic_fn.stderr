@@ -1,11 +1,19 @@
 error: cannot have generic parameters on distributed slice element
  --> tests/ui/generic_fn.rs:9:15
   |
+8 | #[distributed_slice(SLICES)]
+  | ---------------------------- in this procedural macro expansion
 9 | fn type_param<T>() {}
   |               ^
+  |
+  = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: cannot have generic parameters on distributed slice element
   --> tests/ui/generic_fn.rs:12:16
    |
+11 | #[distributed_slice(SLICES)]
+   | ---------------------------- in this procedural macro expansion
 12 | fn const_param<const N: usize>() {}
    |                ^^^^^^^^^^^^^^
+   |
+   = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)
