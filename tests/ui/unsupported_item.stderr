@@ -1,9 +1,5 @@
 error: distributed element must be either static or function item
  --> tests/ui/unsupported_item.rs:9:1
   |
-8 | #[distributed_slice(SLICE)]
-  | --------------------------- in this procedural macro expansion
 9 | extern crate std as _std;
   | ^^^^^^^^^^^^^^^^^^^^^^^^^
-  |
-  = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)
