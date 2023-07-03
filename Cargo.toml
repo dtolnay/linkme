@@ -2,7 +2,7 @@
 name = "linkme"
 version = "0.3.10"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-categories = ["development-tools::build-utils", "development-tools::procedural-macro-helpers", "no-std"]
+categories = ["development-tools::build-utils", "development-tools::procedural-macro-helpers", "no-std", "no-std::no-alloc"]
 description = "Safe cross-platform linker shenanigans"
 documentation = "https://docs.rs/linkme"
 edition = "2021"
