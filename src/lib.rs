@@ -106,7 +106,7 @@
 //! ```
 
 #![no_std]
-#![doc(html_root_url = "https://docs.rs/linkme/0.3.11")]
+#![doc(html_root_url = "https://docs.rs/linkme/0.3.12")]
 #![allow(
     clippy::doc_markdown,
     clippy::empty_enum,
