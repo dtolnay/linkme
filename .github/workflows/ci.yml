@@ -47,7 +47,7 @@ jobs:
         if: matrix.rust == 'nightly'
       - name: Enable type layout randomization
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zrandomize-layout >> $GITHUB_ENV
-        if: matrix.rust == 'nightly'
+        if: matrix.rust == 'nightly' && false # FIXME https://github.com/rust-lang/rust/issues/113941
       - run: cargo check --manifest-path tests/crate/Cargo.toml
       - run: cargo test -p linkme -p linkme-impl
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
