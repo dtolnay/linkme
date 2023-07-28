@@ -158,6 +158,7 @@ impl<T> DistributedSlice<[T]> {
     #[cfg(any(
         target_os = "none",
         target_os = "linux",
+        target_os = "fuchsia",
         target_os = "macos",
         target_os = "ios",
         target_os = "tvos",

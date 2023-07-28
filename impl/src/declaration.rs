@@ -120,6 +120,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg(any(
                 target_os = "none",
                 target_os = "linux",
+                target_os = "fuchsia",
                 target_os = "macos",
                 target_os = "ios",
                 target_os = "tvos",
@@ -128,25 +129,25 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "freebsd",
             ))]
             extern "Rust" {
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_name = #linux_section_start)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_name = #linux_section_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_start)]
                 static LINKME_START: <#ty as #linkme_path::__private::Slice>::Element;
 
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_name = #linux_section_stop)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_name = #linux_section_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
                 static LINKME_STOP: <#ty as #linkme_path::__private::Slice>::Element;
 
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_name = #linux_dupcheck_start)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_name = #linux_dupcheck_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_start)]
                 static DUPCHECK_START: #linkme_path::__private::usize;
 
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_name = #linux_dupcheck_stop)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_name = #linux_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
                 #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_stop)]
@@ -171,13 +172,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
             #used
             #[cfg(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "illumos", target_os = "freebsd"))]
-            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_section = #linux_section)]
+            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
 
             #used
-            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_section = #linux_dupcheck)]
+            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_section = #linux_dupcheck)]
             #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_dupcheck)]
             #[cfg_attr(target_os = "windows", link_section = #windows_dupcheck)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_dupcheck)]
@@ -187,6 +188,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg(not(any(
                 target_os = "none",
                 target_os = "linux",
+                target_os = "fuchsia",
                 target_os = "macos",
                 target_os = "ios",
                 target_os = "tvos",
@@ -238,7 +240,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 $item:item
             ) => {
                 #used
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_section = $linux_section)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_section = $linux_section)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = $macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
@@ -247,7 +249,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             };
             ($item:item) => {
                 #used
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android"), link_section = #linux_section)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia"), link_section = #linux_section)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
