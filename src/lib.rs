@@ -113,6 +113,7 @@
     clippy::expl_impl_clone_on_copy,
     clippy::manual_assert,
     clippy::missing_panics_doc,
+    clippy::missing_safety_doc,
     clippy::must_use_candidate,
     clippy::unused_self
 )]
