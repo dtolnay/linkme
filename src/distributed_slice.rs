@@ -268,6 +268,12 @@ impl<T> DistributedSlice<[T]> {
             // using the unsafe `private_new`.
             None => unsafe { hint::unreachable_unchecked() },
         };
+
+        // On Windows, make sure we discard provenance information.
+        // Otherwise, the compiler has enough information to see we are going "out of bounds".
+        #[cfg(target_os = "windows")]
+        let start = core::hint::black_box(start);
+
         unsafe { slice::from_raw_parts(start, len) }
     }
 }
