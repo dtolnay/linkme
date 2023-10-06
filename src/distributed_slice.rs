@@ -269,10 +269,12 @@ impl<T> DistributedSlice<[T]> {
             None => unsafe { hint::unreachable_unchecked() },
         };
 
-        // On Windows, make sure we discard provenance information.
-        // Otherwise, the compiler has enough information to see we are going "out of bounds".
+        // On Windows, the implementation involves growing a &[T; 0] to
+        // encompass elements that we have asked the linker to place immediately
+        // after that location. The compiler sees this as going "out of bounds"
+        // based on provenance, so we must conceal what is going on.
         #[cfg(target_os = "windows")]
-        let start = core::hint::black_box(start);
+        let start = hint::black_box(start);
 
         unsafe { slice::from_raw_parts(start, len) }
     }
