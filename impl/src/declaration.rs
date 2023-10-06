@@ -206,10 +206,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
             unsafe {
                 #linkme_path::DistributedSlice::private_new(
                     #name,
-                    &LINKME_START,
-                    &LINKME_STOP,
-                    &DUPCHECK_START,
-                    &DUPCHECK_STOP,
+                    #linkme_path::__private::ptr::addr_of!(LINKME_START),
+                    #linkme_path::__private::ptr::addr_of!(LINKME_STOP),
+                    #linkme_path::__private::ptr::addr_of!(DUPCHECK_START),
+                    #linkme_path::__private::ptr::addr_of!(DUPCHECK_STOP),
                 )
             }
         };

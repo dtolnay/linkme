@@ -4,6 +4,8 @@ pub use core::assert;
 pub use core::mem;
 #[doc(hidden)]
 pub use core::primitive::usize;
+#[doc(hidden)]
+pub use core::ptr;
 
 #[doc(hidden)]
 pub trait Slice {
