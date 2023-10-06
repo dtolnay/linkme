@@ -69,4 +69,5 @@ fn test_elided_lifetime() {
     static ELEMENT: &str = "...";
 
     assert!(!MYSLICE.is_empty());
+    assert_eq!(MYSLICE[0], "...");
 }
