@@ -3,7 +3,7 @@
 use linkme::distributed_slice;
 
 #[distributed_slice]
-pub static SLICES: [fn()] = [..];
+pub static SLICES: [fn()];
 
 #[distributed_slice(SLICES)]
 fn type_param<T>() {}

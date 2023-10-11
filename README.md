@@ -37,14 +37,13 @@ operates entirely during compilation and linking.
 ### Declaration
 
 A static distributed slice is declared by writing `#[distributed_slice]` on a
-static item whose type is `[T]` for some type `T`. The initializer expression
-must be `[..]` to indicate that elements come from elsewhere.
+static item whose type is `[T]` for some type `T`.
 
 ```rust
 use linkme::distributed_slice;
 
 #[distributed_slice]
-pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+pub static BENCHMARKS: [fn(&mut Bencher)];
 ```
 
 ### Elements
@@ -120,7 +119,7 @@ definition to place a pointer to that function into a distributed slice.
 use linkme::distributed_slice;
 
 #[distributed_slice]
-pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+pub static BENCHMARKS: [fn(&mut Bencher)];
 
 // Equivalent to:
 //

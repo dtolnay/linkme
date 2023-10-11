@@ -29,11 +29,13 @@ impl Parse for Declaration {
         let ident: Ident = input.parse()?;
         input.parse::<Token![:]>()?;
         let ty: Type = input.parse()?;
-        input.parse::<Token![=]>()?;
 
-        let content;
-        bracketed!(content in input);
-        content.parse::<Token![..]>()?;
+        let eq_token: Option<Token![=]> = input.parse()?;
+        if eq_token.is_some() {
+            let content;
+            bracketed!(content in input);
+            content.parse::<Token![..]>()?;
+        }
 
         input.parse::<Token![;]>()?;
 

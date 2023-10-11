@@ -7,7 +7,7 @@ mod declaration {
 
     #[distributed_slice]
     #[linkme(crate = crate::link_me)]
-    pub static SLICE: [i32] = [..];
+    pub static SLICE: [i32];
 
     #[test]
     fn test_slice() {
@@ -16,7 +16,7 @@ mod declaration {
 
     #[distributed_slice]
     #[linkme(crate = crate::link_me)]
-    pub static FUNCTIONS: [fn()] = [..];
+    pub static FUNCTIONS: [fn()];
 
     #[test]
     fn test_functions() {

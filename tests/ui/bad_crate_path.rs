@@ -8,10 +8,10 @@ mod path {
 
 #[distributed_slice]
 #[linkme(crate = path::to::missing)]
-pub static SLICE1: [&'static str] = [..];
+pub static SLICE1: [&'static str];
 
 #[distributed_slice]
-pub static SLICE2: [&'static str] = [..];
+pub static SLICE2: [&'static str];
 
 #[distributed_slice(SLICE2)]
 #[linkme(crate = path::to::missing)]

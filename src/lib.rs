@@ -32,8 +32,7 @@
 //! of the API. The basic idea is as follows.
 //!
 //! A static distributed slice is declared by writing `#[distributed_slice]` on
-//! a static item whose type is `[T]` for some type `T`. The initializer
-//! expression must be `[..]` to indicate that elements come from elsewhere.
+//! a static item whose type is `[T]` for some type `T`.
 //!
 //! ```
 //! # #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
@@ -43,7 +42,7 @@
 //! use linkme::distributed_slice;
 //!
 //! #[distributed_slice]
-//! pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! pub static BENCHMARKS: [fn(&mut Bencher)];
 //! ```
 //!
 //! Slice elements may be registered into a distributed slice by a
@@ -60,7 +59,7 @@
 //! #     pub struct Bencher;
 //! #
 //! #     #[distributed_slice]
-//! #     pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! #     pub static BENCHMARKS: [fn(&mut Bencher)];
 //! # }
 //! #
 //! # use other_crate::Bencher;
@@ -86,7 +85,7 @@
 //! # struct Bencher;
 //! #
 //! # #[distributed_slice]
-//! # static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! # static BENCHMARKS: [fn(&mut Bencher)];
 //! #
 //! fn main() {
 //!     // Iterate the elements.

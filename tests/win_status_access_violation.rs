@@ -3,7 +3,7 @@
 use linkme::distributed_slice;
 
 #[distributed_slice]
-static ITEMS: [&'static str] = [..];
+static ITEMS: [&'static str];
 
 #[distributed_slice(ITEMS)]
 static ITEM1: &'static str = "item1";

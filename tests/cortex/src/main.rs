@@ -10,7 +10,7 @@ use cortex_m_semihosting::{debug, hprintln};
 use linkme::distributed_slice;
 
 #[distributed_slice]
-static SHENANIGANS: [i32] = [..];
+static SHENANIGANS: [i32];
 
 #[distributed_slice(SHENANIGANS)]
 static N: i32 = 9;

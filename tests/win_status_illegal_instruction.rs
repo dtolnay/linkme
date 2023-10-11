@@ -14,7 +14,7 @@ impl Item {
 }
 
 #[distributed_slice]
-static ITEMS: [Item] = [..];
+static ITEMS: [Item];
 
 #[distributed_slice(ITEMS)]
 static ITEM1: Item = Item { name: "item1" };

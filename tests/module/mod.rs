@@ -2,7 +2,7 @@ mod declaration {
     use linkme::distributed_slice;
 
     #[distributed_slice]
-    pub static SLICE: [i32] = [..];
+    pub static SLICE: [i32];
 
     #[test]
     fn test_mod_slice() {

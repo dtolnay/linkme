@@ -4,7 +4,7 @@ use linkme::distributed_slice;
 use once_cell::sync::Lazy;
 
 #[distributed_slice]
-static SHENANIGANS: [i32] = [..];
+static SHENANIGANS: [i32];
 
 #[distributed_slice(SHENANIGANS)]
 static N: i32 = 9;
@@ -30,7 +30,7 @@ fn test() {
 #[test]
 fn test_empty() {
     #[distributed_slice]
-    static EMPTY: [i32] = [..];
+    static EMPTY: [i32];
 
     assert!(EMPTY.is_empty());
 }
@@ -40,7 +40,7 @@ fn test_non_copy() {
     struct NonCopy(i32);
 
     #[distributed_slice]
-    static NONCOPY: [NonCopy] = [..];
+    static NONCOPY: [NonCopy];
 
     #[distributed_slice(NONCOPY)]
     static ELEMENT: NonCopy = NonCopy(9);
@@ -51,7 +51,7 @@ fn test_non_copy() {
 #[test]
 fn test_interior_mutable() {
     #[distributed_slice]
-    static MUTABLE: [Lazy<i32>] = [..];
+    static MUTABLE: [Lazy<i32>];
 
     #[distributed_slice(MUTABLE)]
     static ELEMENT: Lazy<i32> = Lazy::new(|| -1);
@@ -63,11 +63,18 @@ fn test_interior_mutable() {
 #[test]
 fn test_elided_lifetime() {
     #[distributed_slice]
-    pub static MYSLICE: [&str] = [..];
+    pub static MYSLICE: [&str];
 
     #[distributed_slice(MYSLICE)]
     static ELEMENT: &str = "...";
 
     assert!(!MYSLICE.is_empty());
     assert_eq!(MYSLICE[0], "...");
+}
+
+#[test]
+fn test_legacy_syntax() {
+    // Rustc older than 1.43 requires an initializer expression.
+    #[distributed_slice]
+    pub static LEGACY: [&str] = [..];
 }
