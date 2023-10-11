@@ -43,7 +43,7 @@
 //! use linkme::distributed_slice;
 //!
 //! #[distributed_slice]
-//! pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! pub static BENCHMARKS: [fn(&mut Bencher)];
 //! ```
 //!
 //! Slice elements may be registered into a distributed slice by a
@@ -60,7 +60,7 @@
 //! #     pub struct Bencher;
 //! #
 //! #     #[distributed_slice]
-//! #     pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! #     pub static BENCHMARKS: [fn(&mut Bencher)];
 //! # }
 //! #
 //! # use other_crate::Bencher;
@@ -86,7 +86,7 @@
 //! # struct Bencher;
 //! #
 //! # #[distributed_slice]
-//! # static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! # static BENCHMARKS: [fn(&mut Bencher)];
 //! #
 //! fn main() {
 //!     // Iterate the elements.

@@ -10,7 +10,7 @@ use cortex_m_semihosting::{debug, hprintln};
 use linkme::distributed_slice;
 
 #[distributed_slice]
-static SHENANIGANS: [i32] = [..];
+static SHENANIGANS: [i32];
 
 #[distributed_slice(SHENANIGANS)]
 static N: i32 = 9;
@@ -33,7 +33,7 @@ fn main() -> ! {
     assert_eq!(sum, 9 + 99 + 999);
 
     #[distributed_slice]
-    static EMPTY: [i32] = [..];
+    static EMPTY: [i32];
 
     assert!(EMPTY.is_empty());
 

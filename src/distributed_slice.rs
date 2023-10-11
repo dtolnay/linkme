@@ -27,7 +27,7 @@ use crate::__private::Slice;
 /// use linkme::distributed_slice;
 ///
 /// #[distributed_slice]
-/// pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// pub static BENCHMARKS: [fn(&mut Bencher)];
 /// ```
 ///
 /// The attribute rewrites the `[T]` type of the static into
@@ -54,7 +54,7 @@ use crate::__private::Slice;
 /// #     pub struct Bencher;
 /// #
 /// #     #[distributed_slice]
-/// #     pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// #     pub static BENCHMARKS: [fn(&mut Bencher)];
 /// # }
 /// #
 /// # use other_crate::Bencher;
@@ -81,7 +81,7 @@ use crate::__private::Slice;
 /// #     pub struct Bencher;
 /// #
 /// #     #[distributed_slice]
-/// #     pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// #     pub static BENCHMARKS: [fn(&mut Bencher)];
 /// # }
 /// #
 /// # use linkme::distributed_slice;
@@ -117,7 +117,7 @@ use crate::__private::Slice;
 /// use linkme::distributed_slice;
 ///
 /// #[distributed_slice]
-/// pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+/// pub static BENCHMARKS: [fn(&mut Bencher)];
 ///
 /// // Equivalent to:
 /// //
@@ -235,7 +235,7 @@ impl<T> DistributedSlice<[T]> {
     /// use linkme::distributed_slice;
     ///
     /// #[distributed_slice]
-    /// static BENCHMARKS: [fn(&mut Bencher)] = [..];
+    /// static BENCHMARKS: [fn(&mut Bencher)];
     ///
     /// fn main() {
     ///     // Iterate the elements.

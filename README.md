@@ -44,7 +44,7 @@ must be `[..]` to indicate that elements come from elsewhere.
 use linkme::distributed_slice;
 
 #[distributed_slice]
-pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+pub static BENCHMARKS: [fn(&mut Bencher)];
 ```
 
 ### Elements
@@ -120,7 +120,7 @@ definition to place a pointer to that function into a distributed slice.
 use linkme::distributed_slice;
 
 #[distributed_slice]
-pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+pub static BENCHMARKS: [fn(&mut Bencher)];
 
 // Equivalent to:
 //
