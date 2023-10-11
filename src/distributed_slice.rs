@@ -16,8 +16,7 @@ use crate::__private::Slice;
 /// ## Declaration
 ///
 /// A static distributed slice may be declared by writing `#[distributed_slice]`
-/// on a static item whose type is `[T]` for some type `T`. The initializer
-/// expression must be `[..]` to indicate that elements come from elsewhere.
+/// on a static item whose type is `[T]` for some type `T`.
 ///
 /// ```
 /// # #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
