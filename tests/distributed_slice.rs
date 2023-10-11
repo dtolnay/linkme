@@ -71,3 +71,10 @@ fn test_elided_lifetime() {
     assert!(!MYSLICE.is_empty());
     assert_eq!(MYSLICE[0], "...");
 }
+
+#[test]
+fn test_legacy_syntax() {
+    // Rustc older than 1.43 requires an initializer expression.
+    #[distributed_slice]
+    pub static LEGACY: [&str] = [..];
+}
