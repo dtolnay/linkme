@@ -33,7 +33,7 @@ fn main() -> ! {
     assert_eq!(sum, 9 + 99 + 999);
 
     #[distributed_slice]
-    static EMPTY: [i32];
+    static EMPTY: [i32] = [..];
 
     assert!(EMPTY.is_empty());
 
