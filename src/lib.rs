@@ -42,7 +42,7 @@
 //! use linkme::distributed_slice;
 //!
 //! #[distributed_slice]
-//! pub static BENCHMARKS: [fn(&mut Bencher)] = [..]; // `= [..]` is optional.
+//! pub static BENCHMARKS: [fn(&mut Bencher)];
 //! ```
 //!
 //! Slice elements may be registered into a distributed slice by a
@@ -103,6 +103,35 @@
 //!     let len = BENCHMARKS.len();
 //! }
 //! ```
+//!
+//! <br>
+//!
+//! <details>
+//! <summary>Workaround for buggy IDEs</summary>
+//!
+//! JetBrains's Rust IDE uses an outdated Rust parser that treates distributed
+//! slice declarations as invalid syntax, despite being supported in stable
+//! rustc for over 3.5 years.
+//! See <https://youtrack.jetbrains.com/issue/RUST-12953>.
+//!
+//! If you hit this, you can work around it by adding a dummy initializer
+//! expression to the slice.
+//!
+//! ```
+//! # #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
+//! #
+//! # use linkme::distributed_slice;
+//! #
+//! # struct Bencher;
+//! #
+//! #[distributed_slice]
+//! pub static BENCHMARKS: [fn(&mut Bencher)] = [..];
+//! #
+//! # const _: &str = stringify! {
+//!                                           ^^^^^^
+//! # };
+//! ```
+//! </details>
 
 #![no_std]
 #![doc(html_root_url = "https://docs.rs/linkme/0.3.17")]
