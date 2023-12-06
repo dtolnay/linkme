@@ -42,7 +42,7 @@
 //! use linkme::distributed_slice;
 //!
 //! #[distributed_slice]
-//! pub static BENCHMARKS: [fn(&mut Bencher)];
+//! pub static BENCHMARKS: [fn(&mut Bencher)] = [..]; // `= [..]` is optional.
 //! ```
 //!
 //! Slice elements may be registered into a distributed slice by a
