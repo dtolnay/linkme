@@ -227,6 +227,7 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
             )*
             #(#attrs)*
             #vis static #ident : #ty = {
+                #[allow(clippy::no_effect_underscore_binding)]
                 unsafe fn __typecheck(_: #linkme_path::__private::Void) {
                     let #new = #linkme_path::__private::value::<#ty>;
                     #linkme_path::DistributedSlice::private_typecheck(#path, #uninit)
