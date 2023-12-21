@@ -1,4 +1,5 @@
 #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
+#![deny(unsafe_op_in_unsafe_fn)]
 
 use linkme::distributed_slice;
 use once_cell::sync::Lazy;
