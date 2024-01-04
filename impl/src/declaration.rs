@@ -267,6 +267,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
 fn populate_static_lifetimes(ty: &mut Type) {
     match ty {
+        #![cfg_attr(all(test, exhaustive), deny(non_exhaustive_omitted_patterns))]
         Type::Array(ty) => populate_static_lifetimes(&mut ty.elem),
         Type::Group(ty) => populate_static_lifetimes(&mut ty.elem),
         Type::Paren(ty) => populate_static_lifetimes(&mut ty.elem),
@@ -300,7 +301,7 @@ fn populate_static_lifetimes(ty: &mut Type) {
         | Type::TraitObject(_)
         | Type::BareFn(_)
         | Type::Verbatim(_) => {}
-        #[cfg_attr(all(test, exhaustive), deny(non_exhaustive_omitted_patterns))]
+
         _ => unimplemented!("unknown Type"),
     }
 }
