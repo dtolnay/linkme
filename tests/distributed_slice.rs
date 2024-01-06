@@ -38,7 +38,7 @@ fn test_empty() {
 
 #[test]
 fn test_non_copy() {
-    struct NonCopy(i32);
+    pub struct NonCopy(pub i32);
 
     #[distributed_slice]
     static NONCOPY: [NonCopy];
