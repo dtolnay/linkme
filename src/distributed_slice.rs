@@ -163,7 +163,8 @@ impl<T> DistributedSlice<[T]> {
         target_os = "android",
         target_os = "fuchsia",
         target_os = "illumos",
-        target_os = "freebsd"
+        target_os = "freebsd",
+        target_os = "psp",
     ))]
     pub const unsafe fn private_new(
         name: &'static str,
