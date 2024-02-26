@@ -1,6 +1,7 @@
 #![no_main]
 #![no_std]
 #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
+#![allow(unknown_lints, non_local_definitions)] // FIXME
 
 extern crate panic_semihosting;
 

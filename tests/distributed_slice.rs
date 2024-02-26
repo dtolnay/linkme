@@ -1,5 +1,6 @@
 #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
 #![deny(unsafe_op_in_unsafe_fn)]
+#![allow(unknown_lints, non_local_definitions)] // FIXME
 
 use linkme::distributed_slice;
 use once_cell::sync::Lazy;
