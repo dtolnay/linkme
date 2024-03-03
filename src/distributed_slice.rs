@@ -4,6 +4,7 @@ use core::ops::Deref;
 use core::slice;
 
 use crate::__private::Slice;
+use crate::ptr::StaticPtr;
 
 /// Collection of static elements that are gathered into a contiguous section of
 /// the binary by the linker.
@@ -134,22 +135,6 @@ pub struct DistributedSlice<T: ?Sized + Slice> {
     section_stop: StaticPtr<T::Element>,
     dupcheck_start: StaticPtr<usize>,
     dupcheck_stop: StaticPtr<usize>,
-}
-
-struct StaticPtr<T> {
-    ptr: *const T,
-}
-
-unsafe impl<T> Send for StaticPtr<T> {}
-
-unsafe impl<T> Sync for StaticPtr<T> {}
-
-impl<T> Copy for StaticPtr<T> {}
-
-impl<T> Clone for StaticPtr<T> {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 impl<T> DistributedSlice<[T]> {

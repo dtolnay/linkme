@@ -148,6 +148,7 @@
 )]
 
 mod distributed_slice;
+mod ptr;
 
 // Not public API.
 #[doc(hidden)]
