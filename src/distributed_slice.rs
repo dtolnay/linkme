@@ -212,8 +212,8 @@ impl<T> DistributedSlice<[T]> {
 
     #[doc(hidden)]
     #[inline]
-    pub unsafe fn private_typecheck(self, element: T) {
-        mem::forget(element);
+    pub unsafe fn private_typecheck(self, get: fn() -> &'static T) {
+        let _ = get;
     }
 }
 
