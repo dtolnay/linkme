@@ -12,6 +12,7 @@ mod declaration;
 mod element;
 mod hash;
 mod linker;
+mod ty;
 
 use crate::args::Args;
 use crate::hash::hash;

@@ -18,8 +18,3 @@ impl<T> Slice for [T] {
 
 #[doc(hidden)]
 pub enum Void {}
-
-#[doc(hidden)]
-pub fn value<T>() -> T {
-    panic!()
-}
