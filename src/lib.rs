@@ -147,6 +147,7 @@
     clippy::unused_self
 )]
 
+mod disjointed_static;
 mod distributed_slice;
 mod ptr;
 
@@ -157,4 +158,5 @@ pub mod __private;
 
 pub use linkme_impl::*;
 
+pub use crate::disjointed_static::DisjointedStatic;
 pub use crate::distributed_slice::DistributedSlice;
