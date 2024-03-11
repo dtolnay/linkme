@@ -75,6 +75,8 @@ use crate::ptr::StaticPtr;
 /// will not compile.
 ///
 /// ```compile_fail
+/// # #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
+/// #
 /// # mod other_crate {
 /// #     use linkme::distributed_slice;
 /// #
@@ -93,13 +95,15 @@ use crate::ptr::StaticPtr;
 ///
 /// ```text
 /// error[E0308]: mismatched types
-///   --> src/distributed_slice.rs:65:19
+///   --> tests/ui/mismatched_types.rs
 ///    |
-/// 17 | static BENCH_WTF: usize = 999;
+/// LL | #[distributed_slice(BENCHMARKS)]
+///    | -------------------------------- arguments to this function are incorrect
+/// LL | static BENCH_WTF: usize = 999;
 ///    |                   ^^^^^ expected fn pointer, found `usize`
 ///    |
-///    = note: expected fn pointer `fn(&mut other_crate::Bencher)`
-///                     found type `usize`
+///    = note: expected fn pointer `fn() -> &'static for<'a> fn(&'a mut Bencher)`
+///               found fn pointer `fn() -> &'static usize`
 /// ```
 ///
 /// ## Function elements
