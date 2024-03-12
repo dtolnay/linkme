@@ -134,7 +134,7 @@ impl<T> DisjointedStatic<T> {
         dupcheck_start: *const usize,
         dupcheck_stop: *const usize,
     ) -> Self {
-        DistributedSlice {
+        DisjointedStatic {
             name,
             singleton: StaticPtr { ptr: singleton },
             dupcheck_start: StaticPtr {
