@@ -1,0 +1,11 @@
+error[E0428]: the name `_linkme_macro_STATIC` is defined multiple times
+  --> tests/ui/single_crate_dupe.rs:11:5
+   |
+5  |     #[distributed_slice]
+   |     -------------------- previous definition of the macro `_linkme_macro_STATIC` here
+...
+11 |     #[disjointed_static]
+   |     ^^^^^^^^^^^^^^^^^^^^ `_linkme_macro_STATIC` redefined here
+   |
+   = note: `_linkme_macro_STATIC` must be defined only once in the macro namespace of this module
+   = note: this error originates in the attribute macro `disjointed_static` (in Nightly builds, run with -Z macro-backtrace for more info)
