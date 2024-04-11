@@ -109,7 +109,7 @@
 //! <details>
 //! <summary>Workaround for buggy IDEs</summary>
 //!
-//! JetBrains's Rust IDE uses an outdated Rust parser that treates distributed
+//! JetBrains's Rust IDE uses an outdated Rust parser that treats distributed
 //! slice declarations as invalid syntax, despite being supported in stable
 //! rustc for over 3.5 years.
 //! See <https://youtrack.jetbrains.com/issue/RUST-12953>.
