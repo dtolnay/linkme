@@ -4,6 +4,7 @@ use core::ops::Deref;
 use core::slice;
 
 use crate::__private::Slice;
+use crate::ptr::StaticPtr;
 
 /// Collection of static elements that are gathered into a contiguous section of
 /// the binary by the linker.
@@ -74,6 +75,8 @@ use crate::__private::Slice;
 /// will not compile.
 ///
 /// ```compile_fail
+/// # #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
+/// #
 /// # mod other_crate {
 /// #     use linkme::distributed_slice;
 /// #
@@ -92,13 +95,15 @@ use crate::__private::Slice;
 ///
 /// ```text
 /// error[E0308]: mismatched types
-///   --> src/distributed_slice.rs:65:19
+///   --> tests/ui/mismatched_types.rs
 ///    |
-/// 17 | static BENCH_WTF: usize = 999;
+/// LL | #[distributed_slice(BENCHMARKS)]
+///    | -------------------------------- arguments to this function are incorrect
+/// LL | static BENCH_WTF: usize = 999;
 ///    |                   ^^^^^ expected fn pointer, found `usize`
 ///    |
-///    = note: expected fn pointer `fn(&mut other_crate::Bencher)`
-///                     found type `usize`
+///    = note: expected fn pointer `fn() -> &'static for<'a> fn(&'a mut Bencher)`
+///               found fn pointer `fn() -> &'static usize`
 /// ```
 ///
 /// ## Function elements
@@ -134,22 +139,6 @@ pub struct DistributedSlice<T: ?Sized + Slice> {
     section_stop: StaticPtr<T::Element>,
     dupcheck_start: StaticPtr<usize>,
     dupcheck_stop: StaticPtr<usize>,
-}
-
-struct StaticPtr<T> {
-    ptr: *const T,
-}
-
-unsafe impl<T> Send for StaticPtr<T> {}
-
-unsafe impl<T> Sync for StaticPtr<T> {}
-
-impl<T> Copy for StaticPtr<T> {}
-
-impl<T> Clone for StaticPtr<T> {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 impl<T> DistributedSlice<[T]> {

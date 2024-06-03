@@ -1,9 +1,9 @@
 error[E0308]: mismatched types
-  --> tests/ui/mismatched_types.rs:11:19
+  --> tests/ui/mismatched_types.rs:15:19
    |
-10 | #[distributed_slice(BENCHMARKS)]
+14 | #[distributed_slice(BENCHMARKS)]
    | -------------------------------- arguments to this function are incorrect
-11 | static BENCH_WTF: usize = 999;
+15 | static BENCH_WTF: usize = 999;
    |                   ^^^^^ expected fn pointer, found `usize`
    |
    = note: expected fn pointer `fn() -> &'static for<'a> fn(&'a mut Bencher)`
@@ -15,11 +15,27 @@ note: method defined here
    |                   ^^^^^^^^^^^^^^^^^
 
 error[E0308]: mismatched types
-  --> tests/ui/mismatched_types.rs:14:1
+  --> tests/ui/mismatched_types.rs:18:20
    |
-13 | #[distributed_slice(BENCHMARKS)]
+17 | #[disjointed_static(DEFAULT_CONFIG)]
+   | ------------------------------------ arguments to this function are incorrect
+18 | static CONFIG_WTF: usize = 999;
+   |                    ^^^^^ expected `Config`, found `usize`
+   |
+   = note: expected fn pointer `fn() -> &'static Config`
+              found fn pointer `fn() -> &'static usize`
+note: method defined here
+  --> src/disjointed_static.rs
+   |
+   |     pub const fn private_typecheck(self, get: fn() -> &'static T) {
+   |                  ^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> tests/ui/mismatched_types.rs:21:1
+   |
+20 | #[distributed_slice(BENCHMARKS)]
    | -------------------------------- arguments to this function are incorrect
-14 | fn wrong_bench_fn<'a>(_: &'a mut ()) {}
+21 | fn wrong_bench_fn<'a>(_: &'a mut ()) {}
    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Bencher`, found `()`
    |
    = note: expected fn pointer `fn() -> &'static for<'a> fn(&'a mut Bencher)`
