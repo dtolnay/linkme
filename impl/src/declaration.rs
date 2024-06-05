@@ -102,19 +102,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let illumos_dupcheck_start = illumos_section_start.replacen("linkme", "linkm2", 1);
     let illumos_dupcheck_stop = illumos_section_stop.replacen("linkme", "linkm2", 1);
 
-    let freebsd_section = linker::freebsd::section(&ident);
-    let freebsd_section_start = linker::freebsd::section_start(&ident);
-    let freebsd_section_stop = linker::freebsd::section_stop(&ident);
-    let freebsd_dupcheck = freebsd_section.replacen("linkme", "linkm2", 1);
-    let freebsd_dupcheck_start = freebsd_section_start.replacen("linkme", "linkm2", 1);
-    let freebsd_dupcheck_stop = freebsd_section_stop.replacen("linkme", "linkm2", 1);
-
-    let openbsd_section = linker::openbsd::section(&ident);
-    let openbsd_section_start = linker::openbsd::section_start(&ident);
-    let openbsd_section_stop = linker::openbsd::section_stop(&ident);
-    let openbsd_dupcheck = openbsd_section.replacen("linkme", "linkm2", 1);
-    let openbsd_dupcheck_start = openbsd_section_start.replacen("linkme", "linkm2", 1);
-    let openbsd_dupcheck_stop = openbsd_section_stop.replacen("linkme", "linkm2", 1);
+    let bsd_section = linker::bsd::section(&ident);
+    let bsd_section_start = linker::bsd::section_start(&ident);
+    let bsd_section_stop = linker::bsd::section_stop(&ident);
+    let bsd_dupcheck = bsd_section.replacen("linkme", "linkm2", 1);
+    let bsd_dupcheck_start = bsd_section_start.replacen("linkme", "linkm2", 1);
+    let bsd_dupcheck_stop = bsd_section_stop.replacen("linkme", "linkm2", 1);
 
     let call_site = Span::call_site();
     let link_section_macro_str = format!("_linkme_macro_{}", ident);
@@ -140,29 +133,25 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_section_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
-                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_start)]
-                #[cfg_attr(target_os = "openbsd", link_name = #openbsd_section_start)]
+                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_section_start)]
                 static LINKME_START: <#ty as #linkme_path::__private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_section_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
-                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_section_stop)]
-                #[cfg_attr(target_os = "openbsd", link_name = #openbsd_section_stop)]
+                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_section_stop)]
                 static LINKME_STOP: <#ty as #linkme_path::__private::Slice>::Element;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_dupcheck_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
-                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_start)]
-                #[cfg_attr(target_os = "openbsd", link_name = #openbsd_dupcheck_start)]
+                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_dupcheck_start)]
                 static DUPCHECK_START: #linkme_path::__private::usize;
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
-                #[cfg_attr(target_os = "freebsd", link_name = #freebsd_dupcheck_stop)]
-                #[cfg_attr(target_os = "openbsd", link_name = #openbsd_dupcheck_stop)]
+                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_dupcheck_stop)]
                 static DUPCHECK_STOP: #linkme_path::__private::usize;
             }
 
@@ -186,8 +175,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "illumos", target_os = "freebsd", target_os = "psp"))]
             #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
-            #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
-            #[cfg_attr(target_os = "openbsd", link_section = #openbsd_section)]
+            #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_section = #bsd_section)]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
 
             #used
@@ -195,8 +183,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_dupcheck)]
             #[cfg_attr(target_os = "windows", link_section = #windows_dupcheck)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_dupcheck)]
-            #[cfg_attr(target_os = "freebsd", link_section = #freebsd_dupcheck)]
-            #[cfg_attr(target_os = "openbsd", link_section = #openbsd_dupcheck)]
+            #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_section = #bsd_dupcheck)]
             static DUPCHECK: #linkme_path::__private::usize = 1;
 
             #[cfg(not(any(
@@ -243,8 +230,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     #![linkme_macho_section = concat!(#macho_section, $key)]
                     #![linkme_windows_section = concat!(#windows_section, $key)]
                     #![linkme_illumos_section = concat!(#illumos_section, $key)]
-                    #![linkme_freebsd_section = concat!(#freebsd_section, $key)]
-                    #![linkme_openbsd_section = concat!(#openbsd_section, $key)]
+                    #![linkme_bsd_section = concat!(#bsd_section, $key)]
                     $item
                 }
             };
@@ -253,8 +239,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #![linkme_macho_section = $macho_section:expr]
                 #![linkme_windows_section = $windows_section:expr]
                 #![linkme_illumos_section = $illumos_section:expr]
-                #![linkme_freebsd_section = $freebsd_section:expr]
-                #![linkme_openbsd_section = $openbsd_section:expr]
+                #![linkme_bsd_section = $bsd_section:expr]
                 $item:item
             ) => {
                 #used
@@ -262,8 +247,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = $macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = $windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = $illumos_section)]
-                #[cfg_attr(target_os = "freebsd", link_section = $freebsd_section)]
-                #[cfg_attr(target_os = "openbsd", link_section = $openbsd_section)]
+                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_section = $bsd_section)]
                 $item
             };
             ($item:item) => {
@@ -272,8 +256,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_section = #macho_section)]
                 #[cfg_attr(target_os = "windows", link_section = #windows_section)]
                 #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
-                #[cfg_attr(target_os = "freebsd", link_section = #freebsd_section)]
-                #[cfg_attr(target_os = "openbsd", link_section = #openbsd_section)]
+                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_section = #bsd_section)]
                 $item
             };
         }
