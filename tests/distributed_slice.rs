@@ -30,7 +30,6 @@ fn test() {
 }
 
 #[test]
-#[cfg(not(target_os = "openbsd"))]
 fn test_empty() {
     #[distributed_slice]
     static EMPTY: [i32];

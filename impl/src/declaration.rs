@@ -172,7 +172,16 @@ pub fn expand(input: TokenStream) -> TokenStream {
             static DUPCHECK_STOP: () = ();
 
             #used
-            #[cfg(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "illumos", target_os = "freebsd", target_os = "psp"))]
+            #[cfg(any(
+                target_os = "none",
+                target_os = "linux",
+                target_os = "android",
+                target_os = "fuchsia",
+                target_os = "illumos",
+                target_os = "freebsd",
+                target_os = "openbsd",
+                target_os = "psp",
+            ))]
             #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_section = #linux_section)]
             #[cfg_attr(target_os = "illumos", link_section = #illumos_section)]
             #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_section = #bsd_section)]
