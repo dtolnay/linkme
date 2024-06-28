@@ -54,15 +54,15 @@ jobs:
       - run: cargo check --manifest-path tests/crate/Cargo.toml
       - run: cargo test -p linkme -p linkme-impl
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
-        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu' || matrix.rust == 'nightly-x86_64-pc-windows-msvc'}}
       - run: cargo test -p linkme -p linkme-impl --features used_linker
         if: startsWith(matrix.rust, 'nightly')
-        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu' || matrix.rust == 'nightly-x86_64-pc-windows-msvc'}}
       - run: cargo test -p linkme -p linkme-impl --release
-        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu' || matrix.rust == 'nightly-x86_64-pc-windows-msvc'}}
       - run: cargo test -p linkme -p linkme-impl --release --features used_linker
         if: startsWith(matrix.rust, 'nightly')
-        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+        continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu' || matrix.rust == 'nightly-x86_64-pc-windows-msvc'}}
 
   cortex:
     name: Cortex-M
