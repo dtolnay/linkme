@@ -6,8 +6,8 @@ error[E0308]: mismatched types
 9 | static ELEMENT: &&str = &"uhoh";
   |                 ^^^^^ expected `str`, found `&'static str`
   |
-  = note: expected fn pointer `fn() -> &'static &'static _`
-             found fn pointer `fn() -> &'static &'static &'static _`
+  = note: expected fn pointer `fn() -> &'static &'static str`
+             found fn pointer `fn() -> &'static &'static &'static str`
 note: method defined here
  --> src/distributed_slice.rs
   |
