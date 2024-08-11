@@ -13,7 +13,7 @@
 //! # Platform support
 //!
 //! | Component | Linux | macOS | Windows | FreeBSD | OpenBSD | illumos | Other...<sup>†</sup> |
-//! |:---|:---:|:---:|:---:|:---:|:---:|:---:|
+//! |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 //! | Distributed slice | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | |
 //!
 //! <br>***<sup>†</sup>*** We welcome PRs adding support for any platforms not
