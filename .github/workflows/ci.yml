@@ -63,6 +63,11 @@ jobs:
       - run: cargo test -p linkme -p linkme-impl --release --features used_linker
         if: startsWith(matrix.rust, 'nightly')
         continue-on-error: ${{matrix.rust == 'nightly-x86_64-pc-windows-gnu'}}
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu' && matrix.rust == 'nightly' && always()
+        with:
+          name: Cargo.lock
+          path: Cargo.lock
 
   cortex:
     name: Cortex-M
