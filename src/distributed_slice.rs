@@ -186,7 +186,7 @@ impl<T> DistributedSlice<[T]> {
     }
 
     #[doc(hidden)]
-    #[cfg(target_os = "windows")]
+    #[cfg(any(target_os = "uefi", target_os = "windows"))]
     pub const unsafe fn private_new(
         name: &'static str,
         section_start: *const [T; 0],
@@ -274,7 +274,7 @@ impl<T> DistributedSlice<[T]> {
         // encompass elements that we have asked the linker to place immediately
         // after that location. The compiler sees this as going "out of bounds"
         // based on provenance, so we must conceal what is going on.
-        #[cfg(target_os = "windows")]
+        #[cfg(any(target_os = "uefi", target_os = "windows"))]
         let start = hint::black_box(start);
 
         unsafe { slice::from_raw_parts(start, len) }
