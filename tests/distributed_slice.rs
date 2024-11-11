@@ -1,5 +1,5 @@
 #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
-#![deny(unsafe_op_in_unsafe_fn)]
+#![deny(rust_2024_compatibility, unsafe_op_in_unsafe_fn)]
 #![allow(unknown_lints, non_local_definitions)] // FIXME
 
 use linkme::distributed_slice;
