@@ -5,7 +5,6 @@ authors = ["David Tolnay <dtolnay@gmail.com>"]
 description = "Implementation detail of the linkme crate"
 documentation = "https://docs.rs/linkme"
 edition = "2021"
-exclude = ["build.rs"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/linkme"
 rust-version = "1.62"
