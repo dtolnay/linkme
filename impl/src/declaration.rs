@@ -113,6 +113,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let link_section_macro_str = format!("_linkme_macro_{}", ident);
     let link_section_macro = Ident::new(&link_section_macro_str, call_site);
 
+    let unsafe_extern = if cfg!(no_unsafe_extern_blocks) {
+        None
+    } else {
+        Some(Token![unsafe](call_site))
+    };
+
     quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
@@ -129,7 +135,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "openbsd",
                 target_os = "psp",
             ))]
-            unsafe extern "Rust" {
+            #unsafe_extern extern "Rust" {
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_section_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
