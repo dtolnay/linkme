@@ -216,9 +216,7 @@ impl<T> DistributedSlice<[T]> {
     pub unsafe fn private_typecheck(self, get: fn() -> &'static T) {
         let _ = get;
     }
-}
 
-impl<T> DistributedSlice<[T]> {
     /// Retrieve a contiguous slice containing all the elements linked into this
     /// program.
     ///
