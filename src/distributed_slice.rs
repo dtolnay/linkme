@@ -1,3 +1,4 @@
+use core::fmt::{self, Debug};
 use core::hint;
 use core::mem;
 use core::ops::Deref;
@@ -299,5 +300,14 @@ impl<T: 'static> IntoIterator for DistributedSlice<[T]> {
     type IntoIter = slice::Iter<'static, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.static_slice().iter()
+    }
+}
+
+impl<T> Debug for DistributedSlice<[T]>
+where
+    T: Debug + 'static,
+{
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        Debug::fmt(self.static_slice(), formatter)
     }
 }
