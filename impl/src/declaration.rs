@@ -121,14 +121,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
         Some(Token![unsafe](call_site))
     };
 
-    let (unsafe_attr, link_section_attr, wasm_import_attr, unsafe_attr_2) =
+    let (unsafe_attr, link_section_attr, wasm_import_attr) =
         if cfg!(no_unsafe_attributes) {
             // #[cfg_attr(all(), link_section = ...)]
             (
                 Ident::new("cfg_attr", call_site),
                 quote!(all(), link_section),
                 quote!(all(), wasm_import_module),
-                quote!(),
             )
         } else {
             // #[unsafe(link_section = ...)]
@@ -136,7 +135,6 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 Ident::new("unsafe", call_site),
                 quote!(link_section),
                 quote!(wasm_import_module),
-                quote!(unsafe),
             )
         };
 
@@ -146,7 +144,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg(target_family = "wasm")]
             {
                 #[#unsafe_attr(#wasm_import_attr = #xname)]
-                #unsafe_attr_2 extern "C"{
+                #unsafe_extern extern "C"{
                     fn _init(a: *mut <#ty as #linkme_path::__private::Slice>::Element) -> *mut <#ty as #linkme_path::__private::Slice>::Element;
                     fn _len() -> usize;
                 }
