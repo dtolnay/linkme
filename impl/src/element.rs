@@ -231,7 +231,7 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
                 #![linkme_macro = #path]
                 #![linkme_sort_key = concat!(#uid,#(#sort_key),*)]
             #(#attrs)*
-            #vis extern "C" unsafe fn #ident(a: *mut #ty) -> *mut #ty{
+            #vis  unsafe extern "C" fn #ident(a: *mut #ty) -> *mut #ty{
                 #[allow(clippy::no_effect_underscore_binding)]
                 unsafe fn __typecheck(_: #linkme_path::__private::Void) {
                     #[allow(clippy::ref_option_ref)]
