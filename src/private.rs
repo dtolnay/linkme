@@ -22,3 +22,7 @@ impl<T> Slice for [T] {
 
 #[doc(hidden)]
 pub enum Void {}
+
+
+#[doc(hidden)]
+pub use crate::distributed_slice::StaticPtr;

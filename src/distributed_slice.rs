@@ -148,8 +148,8 @@ pub struct DistributedSlice<T: ?Sized + Slice> {
     #[cfg(target_family = "wasm")]
     len: unsafe fn() -> usize,
 }
-
-struct StaticPtr<T> {
+#[doc(hidden)]
+pub struct StaticPtr<T> {
     ptr: *const T,
 }
 
@@ -172,12 +172,13 @@ impl<T> DistributedSlice<[T]> {
         name: &'static str,
         init: unsafe fn(*mut T::Element) -> *mut T::Element,
         len: unsafe fn() -> usize,
+        lazy: &'static ::std::sync::OnceLock<StaticPtr<T::Element>>,
     ) -> Self {
         DistributedSlice {
             name,
             init,
             len,
-            lazy: ::std::boxed::Box::leak(::std::boxed::Box::new(Default::default())),
+            lazy,
         }
     }
     #[doc(hidden)]
