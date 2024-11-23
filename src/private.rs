@@ -7,6 +7,10 @@ pub use core::primitive::usize;
 #[doc(hidden)]
 pub use core::ptr;
 
+#[cfg(target_family = "wasm")]
+#[doc(hidden)]
+pub use std;
+
 #[doc(hidden)]
 pub trait Slice {
     type Element;

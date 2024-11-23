@@ -61,6 +61,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let mut ty = decl.ty;
     let name = ident.to_string();
 
+    let xname = format!("@@linkme/{name}");
+
     let linkme_path = match attr::linkme_path(&mut attrs) {
         Ok(path) => path,
         Err(err) => return err.to_compile_error(),
@@ -133,6 +135,19 @@ pub fn expand(input: TokenStream) -> TokenStream {
     quote! {
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
+            #[cfg(target_family = "wasm")]
+            {
+                #[#unsafe_attr(wasm_import_module = #xname)]
+                #unsafe_attr extern "C"{
+                    fn _init(a: *mut <#ty as #linkme_path::__private::Slice>::Element) -> *mut <#ty as #linkme_path::__private::Slice>::Element;
+                    fn _len() -> usize;
+                }
+                unsafe{
+                    #linkme_path::DistributedSlice::private_new(#name,_init,_len)
+                }
+            }
+            #[cfg(not(target_family = "wasm"))]
+            {
             #[cfg(any(
                 target_os = "none",
                 target_os = "linux",
@@ -242,6 +257,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     #linkme_path::__private::ptr::addr_of!(DUPCHECK_STOP),
                 )
             }
+        }
         };
 
         #[doc(hidden)]
@@ -258,6 +274,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     #![linkme_windows_section = concat!(#windows_section, $key)]
                     #![linkme_illumos_section = concat!(#illumos_section, $key)]
                     #![linkme_bsd_section = concat!(#bsd_section, $key)]
+                    #![linkme_wasm_export = concat!(#xname,"/",$key)]
                     $item
                 }
             };
@@ -267,6 +284,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #![linkme_windows_section = $windows_section:expr]
                 #![linkme_illumos_section = $illumos_section:expr]
                 #![linkme_bsd_section = $bsd_section:expr]
+                #![linkme_wasm_export = $wasm_export:expr]
                 $item:item
             ) => {
                 #used
@@ -275,6 +293,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = $windows_section))]
                 #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = $illumos_section))]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = $bsd_section))]
+                #[cfg_attr(target_family = "wasm",#unsafe_attr(export_name = $wasm_export))]
                 $item
             };
             ($item:item) => {
@@ -284,6 +303,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = #windows_section))]
                 #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = #illumos_section))]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = #bsd_section))]
+                #[cfg_attr(target_family = "wasm",#unsafe_attr(export_name = #xname))]
                 $item
             };
         }

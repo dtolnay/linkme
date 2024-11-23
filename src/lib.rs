@@ -147,6 +147,9 @@
     clippy::unused_self
 )]
 
+#[cfg(target_family = "wasm")]
+extern crate std;
+
 mod distributed_slice;
 
 // Not public API.

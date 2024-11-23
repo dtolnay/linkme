@@ -215,12 +215,38 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
         Err(err) => return err.to_compile_error(),
     };
 
-    let sort_key = pos.into_iter().map(|pos| format!("{:04}", pos));
+    let sort_key = pos
+        .into_iter()
+        .map(|pos| format!("{:04}", pos))
+        .collect::<Vec<_>>();
 
     let factory = quote_spanned!(input.start_span=> __new);
     let get = quote_spanned!(input.end_span=> #factory());
 
+    let uid = crate::hash(&ident).to_string();
+
     quote! {
+        #[cfg(target_family = "wasm")]
+        #path ! {
+                #![linkme_macro = #path]
+                #![linkme_sort_key = concat!(#uid,#(#sort_key),*)]
+            #(#attrs)*
+            #vis extern "C" unsafe fn #ident(a: *mut #ty) -> *mut #ty{
+                #[allow(clippy::no_effect_underscore_binding)]
+                unsafe fn __typecheck(_: #linkme_path::__private::Void) {
+                    #[allow(clippy::ref_option_ref)]
+                    let #factory = || -> fn() -> &'static #ty { || &#ident };
+                    unsafe {
+                        #linkme_path::DistributedSlice::private_typecheck(#path, #get);
+                    }
+                }
+                unsafe{
+                    a.store(#expr);
+                };
+                return a.add(1);
+            };
+        }
+        #[cfg(not(target_family = "wasm"))]
         #path ! {
             #(
                 #![linkme_macro = #path]

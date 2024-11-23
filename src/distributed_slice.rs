@@ -1,3 +1,5 @@
+use core::alloc::Layout;
+use core::cell::UnsafeCell;
 use core::fmt::{self, Debug};
 use core::hint;
 use core::mem;
@@ -131,10 +133,20 @@ use crate::__private::Slice;
 /// ```
 pub struct DistributedSlice<T: ?Sized + Slice> {
     name: &'static str,
+    #[cfg(not(target_family = "wasm"))]
     section_start: StaticPtr<T::Element>,
+    #[cfg(not(target_family = "wasm"))]
     section_stop: StaticPtr<T::Element>,
+    #[cfg(not(target_family = "wasm"))]
     dupcheck_start: StaticPtr<usize>,
+    #[cfg(not(target_family = "wasm"))]
     dupcheck_stop: StaticPtr<usize>,
+    #[cfg(target_family = "wasm")]
+    lazy: ::std::sync::OnceLock<StaticPtr<T::Element>>,
+    #[cfg(target_family = "wasm")]
+    init: unsafe fn(*mut T::Element) -> *mut T::Element,
+    #[cfg(target_family = "wasm")]
+    len: unsafe fn() -> usize,
 }
 
 struct StaticPtr<T> {
@@ -154,6 +166,20 @@ impl<T> Clone for StaticPtr<T> {
 }
 
 impl<T> DistributedSlice<[T]> {
+    #[doc(hidden)]
+    #[cfg(target_family = "wasm")]
+    pub const unsafe fn private_new(
+        name: &'static str,
+        init: unsafe fn(*mut T::Element) -> *mut T::Element,
+        len: unsafe fn() -> usize,
+    ) -> Self {
+        DistributedSlice {
+            name,
+            init,
+            len,
+            lazy: Default::default(),
+        }
+    }
     #[doc(hidden)]
     #[cfg(any(
         target_os = "none",
@@ -254,29 +280,47 @@ impl<T> DistributedSlice<[T]> {
     /// }
     /// ```
     pub fn static_slice(self) -> &'static [T] {
-        if self.dupcheck_start.ptr.wrapping_add(1) < self.dupcheck_stop.ptr {
-            panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
-        }
+        #[cfg(not(target_family = "wasm"))]
+        {
+            if self.dupcheck_start.ptr.wrapping_add(1) < self.dupcheck_stop.ptr {
+                panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
+            }
 
-        let stride = mem::size_of::<T>();
-        let start = self.section_start.ptr;
-        let stop = self.section_stop.ptr;
-        let byte_offset = stop as usize - start as usize;
-        let len = match byte_offset.checked_div(stride) {
-            Some(len) => len,
-            // The #[distributed_slice] call checks `size_of::<T>() > 0` before
-            // using the unsafe `private_new`.
-            None => unsafe { hint::unreachable_unchecked() },
+            let stride = mem::size_of::<T>();
+            let start = self.section_start.ptr;
+            let stop = self.section_stop.ptr;
+            let byte_offset = stop as usize - start as usize;
+            let len = match byte_offset.checked_div(stride) {
+                Some(len) => len,
+                // The #[distributed_slice] call checks `size_of::<T>() > 0` before
+                // using the unsafe `private_new`.
+                None => unsafe { hint::unreachable_unchecked() },
+            };
+
+            // On Windows, the implementation involves growing a &[T; 0] to
+            // encompass elements that we have asked the linker to place immediately
+            // after that location. The compiler sees this as going "out of bounds"
+            // based on provenance, so we must conceal what is going on.
+            #[cfg(any(target_os = "uefi", target_os = "windows"))]
+            let start = hint::black_box(start);
+
+            return unsafe { slice::from_raw_parts(start, len) };
         };
 
-        // On Windows, the implementation involves growing a &[T; 0] to
-        // encompass elements that we have asked the linker to place immediately
-        // after that location. The compiler sees this as going "out of bounds"
-        // based on provenance, so we must conceal what is going on.
-        #[cfg(any(target_os = "uefi", target_os = "windows"))]
-        let start = hint::black_box(start);
-
-        unsafe { slice::from_raw_parts(start, len) }
+        #[cfg(target_family = "wasm")]
+        {
+            let len = unsafe { (self.len)() };
+            let start = *self.lazy.get_or_init(|| {
+                let start = unsafe { ::std::alloc::alloc(Layout::array::<T::Element>(len)) }
+                    as *mut T::Element;
+                let end = unsafe { (self.init)(start) };
+                if end != start.offset(len) {
+                    panic!("invariant violated: `init` must fill the whole array")
+                }
+                return start;
+            });
+            return unsafe { slice::from_raw_parts(start, len) };
+        };
     }
 }
 
