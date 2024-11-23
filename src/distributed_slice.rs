@@ -1,4 +1,6 @@
+#[allow(unused_imports)]
 use core::alloc::Layout;
+#[allow(unused_imports)]
 use core::cell::UnsafeCell;
 use core::fmt::{self, Debug};
 use core::hint;
