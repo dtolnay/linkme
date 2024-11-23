@@ -11,6 +11,10 @@ pub use core::ptr;
 #[doc(hidden)]
 pub use std;
 
+#[cfg(target_family = "wasm")]
+#[doc(hidden)]
+pub use once_cell;
+
 #[doc(hidden)]
 pub trait Slice {
     type Element;

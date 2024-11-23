@@ -144,7 +144,7 @@ pub struct DistributedSlice<T: ?Sized + Slice> {
     #[cfg(not(target_family = "wasm"))]
     dupcheck_stop: StaticPtr<usize>,
     #[cfg(target_family = "wasm")]
-    lazy: &'static ::std::sync::OnceLock<StaticPtr<T::Element>>,
+    lazy: &'static ::once_cell::sync::OnceCell<StaticPtr<T::Element>>,
     #[cfg(target_family = "wasm")]
     init: unsafe fn(*mut T::Element) -> *mut T::Element,
     #[cfg(target_family = "wasm")]

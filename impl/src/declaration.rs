@@ -148,7 +148,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     fn _init(a: *mut <#ty as #linkme_path::__private::Slice>::Element) -> *mut <#ty as #linkme_path::__private::Slice>::Element;
                     fn _len() -> usize;
                 }
-                static lazy: #linkme_path::__private::std::sync::OnceLock<#linkme_path::__private::StaticPtr<<#ty as #linkme_path::__private::Slice>::Element>> = #linkme_path::__private::std::sync::OnceLock::new();
+                static lazy: #linkme_path::__private::once_cell::sync::OnceCell<#linkme_path::__private::StaticPtr<<#ty as #linkme_path::__private::Slice>::Element>> = #linkme_path::__private::std::sync::OnceLock::new();
                 unsafe{
                     #linkme_path::DistributedSlice::private_new(#name,_init,_len,&lazy)
                 }
