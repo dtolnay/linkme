@@ -45,12 +45,15 @@ jobs:
       - name: Enable deny(non_exhaustive_omitted_patterns)
         run: echo RUSTFLAGS=${RUSTFLAGS}\ --cfg=exhaustive >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
+        shell: bash
       - name: Enable type layout randomization
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zrandomize-layout >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
+        shell: bash
       - name: Disable rust-lld
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zlinker-features=-lld >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
+        shell: bash
       - name: Ignore Windows linker warning
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Alinker_messages >> $GITHUB_ENV
         if: matrix.rust == 'nightly-x86_64-pc-windows-gnu'
