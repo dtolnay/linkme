@@ -51,6 +51,10 @@ jobs:
       - name: Disable rust-lld
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zlinker-features=-lld >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
+      - name: Ignore Windows linker warning
+        run: echo RUSTFLAGS=${RUSTFLAGS}\ -Alinker_messages >> $GITHUB_ENV
+        if: matrix.rust == 'nightly-x86_64-pc-windows-gnu'
+        shell: bash
       - run: cargo check --manifest-path tests/crate/Cargo.toml
       - run: cargo test -p linkme -p linkme-impl
         # windows-gnu: https://github.com/dtolnay/linkme/issues/25
