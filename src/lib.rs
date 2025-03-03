@@ -134,7 +134,7 @@
 //! </details>
 
 #![no_std]
-#![doc(html_root_url = "https://docs.rs/linkme/0.3.31")]
+#![doc(html_root_url = "https://docs.rs/linkme/0.3.32")]
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(
     clippy::doc_markdown,
