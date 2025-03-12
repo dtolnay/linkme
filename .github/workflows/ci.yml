@@ -26,7 +26,12 @@ jobs:
       matrix:
         rust: [nightly, beta, stable, 1.82.0, 1.70.0]
         os: [ubuntu]
+        linker: ['']
         include:
+          - name: Gold linker
+            os: ubuntu
+            rust: nightly
+            linker: gold
           - name: macOS
             os: macos
             rust: nightly
@@ -49,6 +54,10 @@ jobs:
       - name: Enable type layout randomization
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zrandomize-layout >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
+        shell: bash
+      - name: Select non-default linker
+        run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zlinker-features=-lld -Clink-arg=-fuse-ld=${{matrix.linker}} >> $GITHUB_ENV
+        if: matrix.linker
         shell: bash
       - name: Ignore Windows linker warning
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Alinker_messages >> $GITHUB_ENV
