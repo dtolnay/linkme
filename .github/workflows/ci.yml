@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [nightly, beta, stable, 1.82.0, 1.70.0]
+        rust: [nightly, nightly-2025-03-08, nightly-2025-03-09, beta, stable, 1.82.0, 1.70.0]
         os: [ubuntu]
         include:
           - name: macOS
@@ -48,10 +48,6 @@ jobs:
         shell: bash
       - name: Enable type layout randomization
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zrandomize-layout >> $GITHUB_ENV
-        if: matrix.rust == 'nightly'
-        shell: bash
-      - name: Disable rust-lld
-        run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zlinker-features=-lld >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
         shell: bash
       - name: Ignore Windows linker warning
