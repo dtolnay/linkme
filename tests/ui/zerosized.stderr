@@ -4,5 +4,3 @@ error[E0080]: could not evaluate static initializer
 7 | #[distributed_slice]
   | ^^^^^^^^^^^^^^^^^^^^ evaluation panicked: assertion failed: ::linkme::__private::mem::size_of::<<[Unit] as
             ::linkme::__private::Slice>::Element>() > 0
-  |
-  = note: this error originates in the macro `::linkme::__private::assert` (in Nightly builds, run with -Z macro-backtrace for more info)
