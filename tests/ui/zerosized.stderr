@@ -1,6 +1,6 @@
-error[E0080]: could not evaluate static initializer
+error[E0080]: evaluation panicked: assertion failed: ::linkme::__private::mem::size_of::<<[Unit] as
+                          ::linkme::__private::Slice>::Element>() > 0
  --> tests/ui/zerosized.rs:7:1
   |
 7 | #[distributed_slice]
-  | ^^^^^^^^^^^^^^^^^^^^ evaluation panicked: assertion failed: ::linkme::__private::mem::size_of::<<[Unit] as
-            ::linkme::__private::Slice>::Element>() > 0
+  | ^^^^^^^^^^^^^^^^^^^^ evaluation of static initializer failed here
