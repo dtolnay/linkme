@@ -3,4 +3,4 @@ error[E0080]: evaluation panicked: assertion failed: ::linkme::__private::mem::s
  --> tests/ui/zerosized.rs:7:1
   |
 7 | #[distributed_slice]
-  | ^^^^^^^^^^^^^^^^^^^^ evaluation of static initializer failed here
+  | ^^^^^^^^^^^^^^^^^^^^ evaluation of `ZEROSIZED` failed here
