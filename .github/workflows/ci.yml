@@ -56,7 +56,7 @@ jobs:
         if: matrix.rust == 'nightly'
         shell: bash
       - name: Select non-default linker
-        run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zlinker-features=-lld -Clink-arg=-fuse-ld=${{matrix.linker}} >> $GITHUB_ENV
+        run: echo RUSTFLAGS=${RUSTFLAGS}\ -Clinker-features=-lld -Clink-arg=-fuse-ld=${{matrix.linker}} >> $GITHUB_ENV
         if: matrix.linker
         shell: bash
       - name: Ignore Windows linker warning
