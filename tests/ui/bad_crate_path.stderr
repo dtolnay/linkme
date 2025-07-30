@@ -12,7 +12,7 @@ error[E0433]: failed to resolve: could not find `missing` in `to`
    |
 help: consider importing this struct
    |
-3  + use linkme::DistributedSlice;
+ 3 + use linkme::DistributedSlice;
    |
 
 error[E0433]: failed to resolve: could not find `missing` in `to`
@@ -29,5 +29,5 @@ error[E0433]: failed to resolve: could not find `missing` in `to`
    |
 help: consider importing this struct
    |
-3  + use linkme::DistributedSlice;
+ 3 + use linkme::DistributedSlice;
    |
