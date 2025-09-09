@@ -95,6 +95,8 @@ jobs:
           target: thumbv7m-none-eabi
       - name: Install QEMU
         run: |
+          sudo sed -i 's/^update_initramfs=yes$/update_initramfs=no/' /etc/initramfs-tools/update-initramfs.conf
+          sudo rm -f /var/lib/man-db/auto-update
           sudo apt-get update
           sudo apt-get install -y qemu-system-arm
       - run: cargo run --release
