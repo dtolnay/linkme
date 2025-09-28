@@ -133,8 +133,8 @@ pub struct DistributedSlice<T: ?Sized + Slice> {
     name: &'static str,
     section_start: StaticPtr<T::Element>,
     section_stop: StaticPtr<T::Element>,
-    dupcheck_start: StaticPtr<usize>,
-    dupcheck_stop: StaticPtr<usize>,
+    dupcheck_start: StaticPtr<isize>,
+    dupcheck_stop: StaticPtr<isize>,
 }
 
 struct StaticPtr<T> {
@@ -172,8 +172,8 @@ impl<T> DistributedSlice<[T]> {
         name: &'static str,
         section_start: *const [T; 0],
         section_stop: *const [T; 0],
-        dupcheck_start: *const usize,
-        dupcheck_stop: *const [usize; 0],
+        dupcheck_start: *const isize,
+        dupcheck_stop: *const [isize; 0],
     ) -> Self {
         DistributedSlice {
             name,
@@ -210,10 +210,10 @@ impl<T> DistributedSlice<[T]> {
                 ptr: section_stop as *const T,
             },
             dupcheck_start: StaticPtr {
-                ptr: dupcheck_start as *const usize,
+                ptr: dupcheck_start as *const isize,
             },
             dupcheck_stop: StaticPtr {
-                ptr: dupcheck_stop as *const usize,
+                ptr: dupcheck_stop as *const isize,
             },
         }
     }
