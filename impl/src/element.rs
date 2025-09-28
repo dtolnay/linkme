@@ -1,4 +1,4 @@
-use crate::{attr, ty};
+use crate::{attr, private, ty};
 use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Error, Parse, ParseStream, Result};
@@ -229,7 +229,7 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
             #(#attrs)*
             #vis static #ident : #ty = {
                 #[allow(clippy::no_effect_underscore_binding)]
-                unsafe fn __typecheck(_: #linkme_path::__private::Void) {
+                unsafe fn __typecheck(_: #linkme_path::#private::Void) {
                     #[allow(clippy::ref_option_ref)]
                     let #factory = || -> fn() -> &'static #ty { || &#ident };
                     unsafe {

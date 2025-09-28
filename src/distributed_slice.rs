@@ -1,3 +1,4 @@
+use crate::private::Slice;
 use core::fmt::{self, Debug};
 #[cfg(any(target_os = "uefi", target_os = "windows"))]
 use core::hint;
@@ -5,8 +6,6 @@ use core::mem;
 use core::num::NonZeroUsize;
 use core::ops::Deref;
 use core::slice;
-
-use crate::__private::Slice;
 
 /// Collection of static elements that are gathered into a contiguous section of
 /// the binary by the linker.

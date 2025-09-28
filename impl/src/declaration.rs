@@ -1,4 +1,4 @@
-use crate::{attr, linker, ty};
+use crate::{attr, linker, private, ty};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
@@ -151,13 +151,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_section_start)]
-                static LINKME_START: [<#ty as #linkme_path::__private::Slice>::Element; 0];
+                static LINKME_START: [<#ty as #linkme_path::#private::Slice>::Element; 0];
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_section_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_section_stop)]
-                static LINKME_STOP: [<#ty as #linkme_path::__private::Slice>::Element; 0];
+                static LINKME_STOP: [<#ty as #linkme_path::#private::Slice>::Element; 0];
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_dupcheck_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
@@ -174,11 +174,11 @@ pub fn expand(input: TokenStream) -> TokenStream {
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_section_start)]
-            static LINKME_START: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
+            static LINKME_START: [<#ty as #linkme_path::#private::Slice>::Element; 0] = [];
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_section_stop)]
-            static LINKME_STOP: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
+            static LINKME_STOP: [<#ty as #linkme_path::#private::Slice>::Element; 0] = [];
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_dupcheck_start)]
@@ -202,7 +202,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = #linux_section))]
             #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = #illumos_section))]
             #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = #bsd_section))]
-            static mut LINKME_PLEASE: [<#ty as #linkme_path::__private::Slice>::Element; 0] = [];
+            static mut LINKME_PLEASE: [<#ty as #linkme_path::#private::Slice>::Element; 0] = [];
 
             #used
             #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = #linux_dupcheck))]
@@ -210,7 +210,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = #windows_dupcheck))]
             #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = #illumos_dupcheck))]
             #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = #bsd_dupcheck))]
-            static DUPCHECK: #linkme_path::__private::isize = 1;
+            static DUPCHECK: #linkme_path::#private::isize = 1;
 
             #[cfg(not(any(
                 target_os = "none",
@@ -232,10 +232,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
             unsafe {
                 #linkme_path::DistributedSlice::private_new(
                     #name,
-                    #linkme_path::__private::ptr::addr_of!(LINKME_START),
-                    #linkme_path::__private::ptr::addr_of!(LINKME_STOP),
-                    #linkme_path::__private::ptr::addr_of!(DUPCHECK_START),
-                    #linkme_path::__private::ptr::addr_of!(DUPCHECK_STOP),
+                    #linkme_path::#private::ptr::addr_of!(LINKME_START),
+                    #linkme_path::#private::ptr::addr_of!(LINKME_STOP),
+                    #linkme_path::#private::ptr::addr_of!(DUPCHECK_START),
+                    #linkme_path::#private::ptr::addr_of!(DUPCHECK_STOP),
                 )
             }
         };
