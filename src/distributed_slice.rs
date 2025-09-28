@@ -229,11 +229,10 @@ impl<T> DistributedSlice<[T]> {
         let start = self.section_start.ptr;
         let stop = self.section_stop.ptr;
         let byte_offset = stop as usize - start as usize;
-        let len = match byte_offset.checked_div(stride) {
-            Some(len) => len,
+        let Some(len) = byte_offset.checked_div(stride) else {
             // The #[distributed_slice] call checks `size_of::<T>() > 0` before
             // using the unsafe `private_new`.
-            None => unsafe { hint::unreachable_unchecked() },
+            unsafe { hint::unreachable_unchecked() }
         };
 
         // On Windows, the implementation involves growing a &[T; 0] to
