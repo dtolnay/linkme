@@ -9,7 +9,7 @@ edition = "2021"
 keywords = ["linkage"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/linkme"
-rust-version = "1.62"
+rust-version = "1.65"
 
 [[test]]
 name = "module_2015"
