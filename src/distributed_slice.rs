@@ -162,6 +162,8 @@ impl<T> DistributedSlice<[T]> {
         dupcheck_start: *const (),
         dupcheck_stop: *const (),
     ) -> Self {
+        assert!(mem::size_of::<T>() > 0);
+
         DistributedSlice {
             name,
             section_start: StaticPtr {
