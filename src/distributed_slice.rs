@@ -155,6 +155,7 @@ impl<T> Clone for StaticPtr<T> {
 
 impl<T> DistributedSlice<[T]> {
     #[doc(hidden)]
+    #[track_caller]
     pub const unsafe fn private_new(
         name: &'static str,
         section_start: *const [T; 0],
@@ -162,6 +163,8 @@ impl<T> DistributedSlice<[T]> {
         dupcheck_start: *const (),
         dupcheck_stop: *const (),
     ) -> Self {
+        assert!(mem::size_of::<T>() > 0);
+
         DistributedSlice {
             name,
             section_start: StaticPtr {

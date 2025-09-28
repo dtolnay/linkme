@@ -1,6 +1,7 @@
-error[E0080]: evaluation panicked: assertion failed: ::linkme::__private::mem::size_of::<<[Unit] as
-                          ::linkme::__private::Slice>::Element>() > 0
+error[E0080]: evaluation panicked: assertion failed: mem::size_of::<T>() > 0
  --> tests/ui/zerosized.rs:7:1
   |
 7 | #[distributed_slice]
   | ^^^^^^^^^^^^^^^^^^^^ evaluation of `ZEROSIZED` failed here
+  |
+  = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)
