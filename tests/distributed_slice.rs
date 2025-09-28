@@ -80,3 +80,33 @@ fn test_legacy_syntax() {
     #[distributed_slice]
     pub static LEGACY: [&str] = [..];
 }
+
+#[test]
+fn test_zero_sized_struct() {
+    struct ZeroSized;
+
+    #[distributed_slice]
+    static ZEROSTRUCTS: [ZeroSized];
+
+    #[distributed_slice(ZEROSTRUCTS)]
+    static ONE: ZeroSized = ZeroSized;
+
+    #[distributed_slice(ZEROSTRUCTS)]
+    static TWO: ZeroSized = ZeroSized;
+
+    assert_eq!(ZEROSTRUCTS.len(), 2);
+}
+
+#[test]
+fn test_zero_sized_array() {
+    #[distributed_slice]
+    static ZEROARRAYS: [[usize; 0]];
+
+    #[distributed_slice(ZEROARRAYS)]
+    static ONE: [usize; 0] = [];
+
+    #[distributed_slice(ZEROARRAYS)]
+    static TWO: [usize; 0] = [];
+
+    assert_eq!(ZEROARRAYS.len(), 2);
+}

@@ -1,4 +1,5 @@
 use core::fmt::{self, Debug};
+#[cfg(any(target_os = "uefi", target_os = "windows"))]
 use core::hint;
 use core::mem;
 use core::ops::Deref;
@@ -270,9 +271,7 @@ impl<T> DistributedSlice<[T]> {
         let byte_offset = stop as usize - start as usize;
         let len = match byte_offset.checked_div(stride) {
             Some(len) => len,
-            // The #[distributed_slice] call checks `size_of::<T>() > 0` before
-            // using the unsafe `private_new`.
-            None => unsafe { hint::unreachable_unchecked() },
+            None => byte_offset / mem::align_of::<T>(),
         };
 
         // On Windows, the implementation involves growing a &[T; 0] to

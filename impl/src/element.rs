@@ -237,6 +237,15 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
                     }
                 }
 
+                #path ! {
+                    #![linkme_macro = #path]
+                    static __linkme_padding: [
+                        #linkme_path::__private::Padding<#ty>; #linkme_path::__private::padding::<#ty>()
+                    ] = [
+                        #linkme_path::__private::Padding::VALUE; #linkme_path::__private::padding::<#ty>()
+                    ];
+                }
+
                 #expr
             };
         }
