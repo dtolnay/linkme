@@ -1,6 +1,8 @@
 use core::fmt::{self, Debug};
+#[cfg(any(target_os = "uefi", target_os = "windows"))]
 use core::hint;
 use core::mem;
+use core::num::NonZeroUsize;
 use core::ops::Deref;
 use core::slice;
 
@@ -131,6 +133,7 @@ use crate::__private::Slice;
 /// ```
 pub struct DistributedSlice<T: ?Sized + Slice> {
     name: &'static str,
+    stride: NonZeroUsize,
     section_start: StaticPtr<T::Element>,
     section_stop: StaticPtr<T::Element>,
     dupcheck_start: StaticPtr<isize>,
@@ -163,12 +166,13 @@ impl<T> DistributedSlice<[T]> {
         dupcheck_start: *const (),
         dupcheck_stop: *const (),
     ) -> Self {
-        if mem::size_of::<T>() == 0 {
+        let Some(stride) = NonZeroUsize::new(mem::size_of::<T>()) else {
             panic!("#[distributed_slice] requires that the slice element type has nonzero size");
-        }
+        };
 
         DistributedSlice {
             name,
+            stride,
             section_start: StaticPtr {
                 ptr: section_start.cast::<T>(),
             },
@@ -230,15 +234,10 @@ impl<T> DistributedSlice<[T]> {
             panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
         }
 
-        let stride = mem::size_of::<T>();
         let start = self.section_start.ptr;
         let stop = self.section_stop.ptr;
         let byte_offset = stop as usize - start as usize;
-        let Some(len) = byte_offset.checked_div(stride) else {
-            // The #[distributed_slice] call checks `size_of::<T>() > 0` before
-            // using the unsafe `private_new`.
-            unsafe { hint::unreachable_unchecked() }
-        };
+        let len = byte_offset / self.stride;
 
         // On Windows, the implementation involves growing a &[T; 0] to
         // encompass elements that we have asked the linker to place immediately
