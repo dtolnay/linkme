@@ -204,16 +204,16 @@ impl<T> DistributedSlice<[T]> {
         DistributedSlice {
             name,
             section_start: StaticPtr {
-                ptr: section_start as *const T,
+                ptr: section_start.cast::<T>(),
             },
             section_stop: StaticPtr {
-                ptr: section_stop as *const T,
+                ptr: section_stop.cast::<T>(),
             },
             dupcheck_start: StaticPtr {
-                ptr: dupcheck_start as *const isize,
+                ptr: dupcheck_start.cast::<isize>(),
             },
             dupcheck_stop: StaticPtr {
-                ptr: dupcheck_stop as *const isize,
+                ptr: dupcheck_stop.cast::<isize>(),
             },
         }
     }
