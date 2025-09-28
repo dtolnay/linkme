@@ -17,6 +17,8 @@ mod ty;
 use crate::args::Args;
 use crate::hash::hash;
 use proc_macro::TokenStream;
+use proc_macro2::{Ident, Span};
+use quote::{ToTokens, TokenStreamExt as _};
 use syn::parse_macro_input;
 
 #[proc_macro_attribute]
@@ -30,4 +32,16 @@ pub fn distributed_slice(args: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(expanded)
+}
+
+#[allow(non_camel_case_types)]
+struct private;
+
+impl ToTokens for private {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        tokens.append(Ident::new(
+            concat!("__private", env!("CARGO_PKG_VERSION_PATCH")),
+            Span::call_site(),
+        ));
+    }
 }

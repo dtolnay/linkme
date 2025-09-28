@@ -148,11 +148,9 @@
 )]
 
 mod distributed_slice;
+mod private;
 
-// Not public API.
-#[doc(hidden)]
-#[path = "private.rs"]
-pub mod __private;
+include!(concat!(env!("OUT_DIR"), "/private.rs"));
 
 pub use linkme_impl::*;
 
