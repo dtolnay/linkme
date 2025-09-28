@@ -163,7 +163,9 @@ impl<T> DistributedSlice<[T]> {
         dupcheck_start: *const (),
         dupcheck_stop: *const (),
     ) -> Self {
-        assert!(mem::size_of::<T>() > 0);
+        if mem::size_of::<T>() == 0 {
+            panic!("#[distributed_slice] requires that the slice element type has nonzero size");
+        }
 
         DistributedSlice {
             name,
