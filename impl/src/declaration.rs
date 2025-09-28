@@ -262,6 +262,19 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 }
             };
             (
+                #![linkme_macro = $macro:path]
+                $item:item
+            ) => {
+                $macro ! {
+                    #![linkme_linux_section = #linux_section]
+                    #![linkme_macho_section = #macho_section]
+                    #![linkme_windows_section = #windows_section]
+                    #![linkme_illumos_section = #illumos_section]
+                    #![linkme_bsd_section = #bsd_section]
+                    $item
+                }
+            };
+            (
                 #![linkme_linux_section = $linux_section:expr]
                 #![linkme_macho_section = $macho_section:expr]
                 #![linkme_windows_section = $windows_section:expr]
@@ -275,15 +288,6 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = $windows_section))]
                 #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = $illumos_section))]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = $bsd_section))]
-                $item
-            };
-            ($item:item) => {
-                #used
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = #linux_section))]
-                #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), #unsafe_attr(#link_section_attr = #macho_section))]
-                #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = #windows_section))]
-                #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = #illumos_section))]
-                #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = #bsd_section))]
                 $item
             };
         }
