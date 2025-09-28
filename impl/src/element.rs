@@ -222,8 +222,8 @@ fn do_expand(path: Path, pos: Option<usize>, input: Element) -> TokenStream {
 
     quote! {
         #path ! {
+            #![linkme_macro = #path]
             #(
-                #![linkme_macro = #path]
                 #![linkme_sort_key = #sort_key]
             )*
             #(#attrs)*
