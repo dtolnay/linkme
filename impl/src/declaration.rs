@@ -163,13 +163,13 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_dupcheck_start)]
-                static DUPCHECK_START: #linkme_path::__private::isize;
+                static DUPCHECK_START: ();
 
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_dupcheck_stop)]
-                static DUPCHECK_STOP: [#linkme_path::__private::isize; 0];
+                static DUPCHECK_STOP: ();
             }
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]

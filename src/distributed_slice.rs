@@ -155,45 +155,6 @@ impl<T> Clone for StaticPtr<T> {
 
 impl<T> DistributedSlice<[T]> {
     #[doc(hidden)]
-    #[cfg(any(
-        target_os = "none",
-        target_os = "linux",
-        target_os = "macos",
-        target_os = "ios",
-        target_os = "tvos",
-        target_os = "android",
-        target_os = "fuchsia",
-        target_os = "illumos",
-        target_os = "freebsd",
-        target_os = "openbsd",
-        target_os = "psp",
-    ))]
-    pub const unsafe fn private_new(
-        name: &'static str,
-        section_start: *const [T; 0],
-        section_stop: *const [T; 0],
-        dupcheck_start: *const isize,
-        dupcheck_stop: *const [isize; 0],
-    ) -> Self {
-        DistributedSlice {
-            name,
-            section_start: StaticPtr {
-                ptr: section_start.cast(),
-            },
-            section_stop: StaticPtr {
-                ptr: section_stop.cast(),
-            },
-            dupcheck_start: StaticPtr {
-                ptr: dupcheck_start,
-            },
-            dupcheck_stop: StaticPtr {
-                ptr: dupcheck_stop.cast(),
-            },
-        }
-    }
-
-    #[doc(hidden)]
-    #[cfg(any(target_os = "uefi", target_os = "windows"))]
     pub const unsafe fn private_new(
         name: &'static str,
         section_start: *const [T; 0],
