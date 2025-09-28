@@ -170,19 +170,25 @@ impl<T> DistributedSlice<[T]> {
     ))]
     pub const unsafe fn private_new(
         name: &'static str,
-        section_start: *const T,
-        section_stop: *const T,
+        section_start: *const [T; 0],
+        section_stop: *const [T; 0],
         dupcheck_start: *const usize,
-        dupcheck_stop: *const usize,
+        dupcheck_stop: *const [usize; 0],
     ) -> Self {
         DistributedSlice {
             name,
-            section_start: StaticPtr { ptr: section_start },
-            section_stop: StaticPtr { ptr: section_stop },
+            section_start: StaticPtr {
+                ptr: section_start.cast(),
+            },
+            section_stop: StaticPtr {
+                ptr: section_stop.cast(),
+            },
             dupcheck_start: StaticPtr {
                 ptr: dupcheck_start,
             },
-            dupcheck_stop: StaticPtr { ptr: dupcheck_stop },
+            dupcheck_stop: StaticPtr {
+                ptr: dupcheck_stop.cast(),
+            },
         }
     }
 
