@@ -1,4 +1,4 @@
-error[E0080]: evaluation panicked: assertion failed: mem::size_of::<T>() > 0
+error[E0080]: evaluation panicked: #[distributed_slice] requires that the slice element type has nonzero size
  --> tests/ui/zerosized.rs:7:1
   |
 7 | #[distributed_slice]
