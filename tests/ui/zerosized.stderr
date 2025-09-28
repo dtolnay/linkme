@@ -2,10 +2,6 @@ error[E0080]: evaluation panicked: assertion failed: mem::size_of::<T>() > 0
  --> tests/ui/zerosized.rs:7:1
   |
 7 | #[distributed_slice]
-  | ^^^^^^^^^^^^^^^^^^^^ evaluation of `ZEROSIZED` failed inside this call
+  | ^^^^^^^^^^^^^^^^^^^^ evaluation of `ZEROSIZED` failed here
   |
-note: inside `DistributedSlice::<[Unit]>::private_new`
- --> src/distributed_slice.rs
-  |
-  |         assert!(mem::size_of::<T>() > 0);
-  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the failure occurred here
+  = note: this error originates in the attribute macro `distributed_slice` (in Nightly builds, run with -Z macro-backtrace for more info)
