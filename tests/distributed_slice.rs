@@ -58,8 +58,8 @@ fn test_interior_mutable() {
     #[distributed_slice(MUTABLE)]
     static ELEMENT: Lazy<i32> = Lazy::new(|| -1);
 
-    assert!(MUTABLE.len() == 1);
-    assert!(*MUTABLE[0] == -1);
+    assert_eq!(MUTABLE.len(), 1);
+    assert_eq!(*MUTABLE[0], -1);
 }
 
 #[test]
