@@ -138,7 +138,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(
     clippy::doc_markdown,
-    clippy::empty_enum,
+    clippy::empty_enums,
     clippy::expl_impl_clone_on_copy,
     clippy::manual_assert,
     clippy::missing_panics_doc,
