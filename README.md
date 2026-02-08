@@ -19,7 +19,7 @@ here.
 linkme = "0.3"
 ```
 
-*Supports rustc 1.68+*
+*Supports rustc 1.71+*
 
 <br>
 
