@@ -178,11 +178,11 @@ pub fn expand(input: TokenStream) -> TokenStream {
             // arithmetic.
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_section_start)]
-            static LINKME_START: #linkme_path::#private::mem::MaybeUninit<<#ty as #linkme_path::#private::Slice>::Element> = #linkme_path::#private::mem::MaybeUninit::uninit();
+            static LINKME_START: #linkme_path::#private::BoundaryElement<#ty> = #linkme_path::#private::BoundaryElement::<#ty>::uninit();
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_section_stop)]
-            static LINKME_STOP: #linkme_path::#private::mem::MaybeUninit<<#ty as #linkme_path::#private::Slice>::Element> = #linkme_path::#private::mem::MaybeUninit::uninit();
+            static LINKME_STOP: #linkme_path::#private::BoundaryElement<#ty> = #linkme_path::#private::BoundaryElement::<#ty>::uninit();
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_dupcheck_start)]

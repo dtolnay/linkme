@@ -1,6 +1,4 @@
 #[doc(hidden)]
-pub use core::mem;
-#[doc(hidden)]
 pub use core::primitive::isize;
 #[doc(hidden)]
 pub use core::ptr;
@@ -16,3 +14,7 @@ impl<T> Slice for [T] {
 
 #[doc(hidden)]
 pub enum Void {}
+
+#[cfg(any(target_os = "uefi", target_os = "windows"))]
+#[doc(hidden)]
+pub type BoundaryElement<T> = core::mem::MaybeUninit<<T as Slice>::Element>;
