@@ -229,12 +229,22 @@ impl<T> DistributedSlice<[T]> {
     /// }
     /// ```
     pub fn static_slice(self) -> &'static [T] {
-        if self.dupcheck_start.ptr.wrapping_add(1) < self.dupcheck_stop.ptr {
+        // On Windows/UEFI, sentinels are non-ZST (MaybeUninit<T> and isize)
+        // so dupcheck and slice boundary arithmetic must account for their size.
+        #[cfg(any(target_os = "uefi", target_os = "windows"))]
+        let is_duplicate = self.dupcheck_start.ptr.wrapping_add(2) < self.dupcheck_stop.ptr;
+        #[cfg(not(any(target_os = "uefi", target_os = "windows")))]
+        let is_duplicate = self.dupcheck_start.ptr.wrapping_add(1) < self.dupcheck_stop.ptr;
+        if is_duplicate {
             panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
         }
 
         let start = self.section_start.ptr;
         let stop = self.section_stop.ptr;
+
+        // Skip the non-ZST start sentinel on Windows/UEFI.
+        #[cfg(any(target_os = "uefi", target_os = "windows"))]
+        let start = unsafe { start.add(1) };
         let byte_offset = stop as usize - start as usize;
         let len = byte_offset / self.stride;
 

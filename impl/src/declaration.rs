@@ -172,21 +172,24 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 static DUPCHECK_STOP: ();
             }
 
+            // On Windows/UEFI, use non-ZST sentinels because some codegen
+            // backends emit non-zero bytes for ZST statics in custom PE/COFF
+            // sections, which corrupts section boundary and dupcheck arithmetic.
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_section_start)]
-            static LINKME_START: [<#ty as #linkme_path::#private::Slice>::Element; 0] = [];
+            static LINKME_START: ::core::mem::MaybeUninit<<#ty as #linkme_path::#private::Slice>::Element> = ::core::mem::MaybeUninit::uninit();
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_section_stop)]
-            static LINKME_STOP: [<#ty as #linkme_path::#private::Slice>::Element; 0] = [];
+            static LINKME_STOP: ::core::mem::MaybeUninit<<#ty as #linkme_path::#private::Slice>::Element> = ::core::mem::MaybeUninit::uninit();
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_dupcheck_start)]
-            static DUPCHECK_START: () = ();
+            static DUPCHECK_START: #linkme_path::#private::isize = 0;
 
             #[cfg(any(target_os = "uefi", target_os = "windows"))]
             #[#unsafe_attr(#link_section_attr = #windows_dupcheck_stop)]
-            static DUPCHECK_STOP: () = ();
+            static DUPCHECK_STOP: #linkme_path::#private::isize = 0;
 
             #used
             #[cfg(any(
@@ -232,10 +235,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
             unsafe {
                 #linkme_path::DistributedSlice::private_new(
                     #name,
-                    #linkme_path::#private::ptr::addr_of!(LINKME_START),
-                    #linkme_path::#private::ptr::addr_of!(LINKME_STOP),
-                    #linkme_path::#private::ptr::addr_of!(DUPCHECK_START),
-                    #linkme_path::#private::ptr::addr_of!(DUPCHECK_STOP),
+                    #linkme_path::#private::ptr::addr_of!(LINKME_START).cast(),
+                    #linkme_path::#private::ptr::addr_of!(LINKME_STOP).cast(),
+                    #linkme_path::#private::ptr::addr_of!(DUPCHECK_START).cast(),
+                    #linkme_path::#private::ptr::addr_of!(DUPCHECK_STOP).cast(),
                 )
             }
         };
