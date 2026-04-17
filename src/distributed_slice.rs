@@ -160,10 +160,10 @@ impl<T> DistributedSlice<[T]> {
     #[track_caller]
     pub const unsafe fn private_new(
         name: &'static str,
-        section_start: *const [T; 0],
-        section_stop: *const [T; 0],
-        dupcheck_start: *const (),
-        dupcheck_stop: *const (),
+        section_start: *const T,
+        section_stop: *const T,
+        dupcheck_start: *const isize,
+        dupcheck_stop: *const isize,
     ) -> Self {
         let Some(stride) = NonZeroUsize::new(mem::size_of::<T>()) else {
             panic!("#[distributed_slice] requires that the slice element type has nonzero size");
@@ -172,18 +172,12 @@ impl<T> DistributedSlice<[T]> {
         DistributedSlice {
             name,
             stride,
-            section_start: StaticPtr {
-                ptr: section_start.cast::<T>(),
-            },
-            section_stop: StaticPtr {
-                ptr: section_stop.cast::<T>(),
-            },
+            section_start: StaticPtr { ptr: section_start },
+            section_stop: StaticPtr { ptr: section_stop },
             dupcheck_start: StaticPtr {
-                ptr: dupcheck_start.cast::<isize>(),
+                ptr: dupcheck_start,
             },
-            dupcheck_stop: StaticPtr {
-                ptr: dupcheck_stop.cast::<isize>(),
-            },
+            dupcheck_stop: StaticPtr { ptr: dupcheck_stop },
         }
     }
 
@@ -229,22 +223,16 @@ impl<T> DistributedSlice<[T]> {
     /// }
     /// ```
     pub fn static_slice(self) -> &'static [T] {
-        // On Windows/UEFI, sentinels are non-ZST (MaybeUninit<T> and isize)
-        // so dupcheck and slice boundary arithmetic must account for their size.
-        #[cfg(any(target_os = "uefi", target_os = "windows"))]
-        let is_duplicate = self.dupcheck_start.ptr.wrapping_add(2) < self.dupcheck_stop.ptr;
-        #[cfg(not(any(target_os = "uefi", target_os = "windows")))]
-        let is_duplicate = self.dupcheck_start.ptr.wrapping_add(1) < self.dupcheck_stop.ptr;
-        if is_duplicate {
+        // On Windows/UEFI, boundary elements are non-ZST (MaybeUninit<T> and
+        // isize) so dupcheck and slice boundary arithmetic must account for
+        // their size.
+        let skip = usize::from(cfg!(any(target_os = "uefi", target_os = "windows")));
+        if self.dupcheck_start.ptr.wrapping_add(skip + 1) < self.dupcheck_stop.ptr {
             panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
         }
 
-        let start = self.section_start.ptr;
+        let start = unsafe { self.section_start.ptr.add(skip) };
         let stop = self.section_stop.ptr;
-
-        // Skip the non-ZST start sentinel on Windows/UEFI.
-        #[cfg(any(target_os = "uefi", target_os = "windows"))]
-        let start = unsafe { start.add(1) };
         let byte_offset = stop as usize - start as usize;
         let len = byte_offset / self.stride;
 
