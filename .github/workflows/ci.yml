@@ -109,6 +109,24 @@ jobs:
           RUSTFLAGS: -C link-arg=-Tlink.x -D warnings
         working-directory: tests/cortex
 
+  wasm:
+    name: WebAssembly
+    needs: pre_ci
+    if: needs.pre_ci.outputs.continue
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        target:
+          - wasm32-unknown-emscripten
+          - wasm32-unknown-unknown
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          target: ${{matrix.target}}
+      - run: cargo check --target ${{matrix.target}} -p linkme --tests
+
   msrv:
     name: Rust 1.71.0
     needs: pre_ci

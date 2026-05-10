@@ -7,13 +7,25 @@ use core::num::NonZeroUsize;
 use core::ops::Deref;
 use core::slice;
 
-/// Collection of static elements that are gathered into a contiguous section of
-/// the binary by the linker.
+/// Collection of static elements.
+///
+/// On most platforms they are gathered into a contiguous section of the binary
+/// by the linker. On wasm32 targets, startup constructors register elements
+/// and the slice is materialized on first access.
 ///
 /// The implementation is based on `link_section` attributes and
-/// platform-specific linker support. It does not involve life-before-main or
-/// any other runtime initialization on any platform. This is a zero-cost safe
-/// abstraction that operates entirely during compilation and linking.
+/// platform-specific linker support. Except on wasm32, it does not involve
+/// life-before-main or any other runtime initialization. On wasm32, startup
+/// constructors are used to collect elements because wasm custom sections
+/// cannot carry the relocations needed by arbitrary Rust statics.
+///
+/// On `wasm32-unknown-emscripten` and WASI targets the runtime invokes
+/// `.init_array` constructors automatically before `main`. On
+/// `wasm32-unknown-unknown` the embedder must call `__wasm_call_ctors`
+/// explicitly; wasm-bindgen handles this transparently.
+///
+/// Duplicate slice detection is performed via the linker on supported native
+/// targets and is skipped on wasm32.
 ///
 /// ## Declaration
 ///
@@ -130,6 +142,7 @@ use core::slice;
 ///     /* ... */
 /// }
 /// ```
+#[cfg_attr(target_arch = "wasm32", allow(dead_code))]
 pub struct DistributedSlice<T: ?Sized + Slice> {
     name: &'static str,
     stride: NonZeroUsize,
@@ -137,6 +150,8 @@ pub struct DistributedSlice<T: ?Sized + Slice> {
     section_stop: StaticPtr<T::Element>,
     dupcheck_start: StaticPtr<isize>,
     dupcheck_stop: StaticPtr<isize>,
+    #[cfg(target_arch = "wasm32")]
+    wasm_registry: StaticPtr<crate::private::WasmRegistry<T::Element>>,
 }
 
 struct StaticPtr<T> {
@@ -178,6 +193,40 @@ impl<T> DistributedSlice<[T]> {
                 ptr: dupcheck_start,
             },
             dupcheck_stop: StaticPtr { ptr: dupcheck_stop },
+            #[cfg(target_arch = "wasm32")]
+            wasm_registry: StaticPtr {
+                ptr: core::ptr::null(),
+            },
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[doc(hidden)]
+    #[track_caller]
+    pub const unsafe fn private_new_wasm(
+        name: &'static str,
+        registry: *const crate::private::WasmRegistry<T>,
+    ) -> Self {
+        let Some(stride) = NonZeroUsize::new(mem::size_of::<T>()) else {
+            panic!("#[distributed_slice] requires that the slice element type has nonzero size");
+        };
+
+        DistributedSlice {
+            name,
+            stride,
+            section_start: StaticPtr {
+                ptr: core::ptr::null(),
+            },
+            section_stop: StaticPtr {
+                ptr: core::ptr::null(),
+            },
+            dupcheck_start: StaticPtr {
+                ptr: core::ptr::null(),
+            },
+            dupcheck_stop: StaticPtr {
+                ptr: core::ptr::null(),
+            },
+            wasm_registry: StaticPtr { ptr: registry },
         }
     }
 
@@ -185,6 +234,17 @@ impl<T> DistributedSlice<[T]> {
     #[inline]
     pub unsafe fn private_typecheck(self, get: fn() -> &'static T) {
         let _ = get;
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[doc(hidden)]
+    pub unsafe fn private_wasm_register(self, node: &'static crate::private::WasmEntryNode<T>)
+    where
+        T: 'static,
+    {
+        unsafe {
+            (*self.wasm_registry.ptr).register(node);
+        }
     }
 
     /// Retrieve a contiguous slice containing all the elements linked into this
@@ -195,6 +255,12 @@ impl<T> DistributedSlice<[T]> {
     /// through the power of `Deref`. In particular, iteration and indexing and
     /// method calls can all happen directly on the static without calling
     /// `static_slice()`.
+    ///
+    /// On wasm32 targets, the slice is materialized on the first call from
+    /// elements registered by startup constructors, then cached for all
+    /// subsequent calls. The returned slice is a byte copy of the original
+    /// element statics; for elements with interior mutability or that require
+    /// address identity, use [`iter_refs()`][Self::iter_refs] instead.
     ///
     /// ```no_run
     /// # #![cfg_attr(feature = "used_linker", feature(used_with_arg))]
@@ -223,27 +289,61 @@ impl<T> DistributedSlice<[T]> {
     /// }
     /// ```
     pub fn static_slice(self) -> &'static [T] {
-        // On Windows/UEFI, boundary elements are non-ZST (MaybeUninit<T> and
-        // isize) so dupcheck and slice boundary arithmetic must account for
-        // their size.
-        let skip = usize::from(cfg!(any(target_os = "uefi", target_os = "windows")));
-        if self.dupcheck_start.ptr.wrapping_add(skip + 1) < self.dupcheck_stop.ptr {
-            panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
+        #[cfg(target_arch = "wasm32")]
+        {
+            unsafe { (*self.wasm_registry.ptr).static_slice() }
         }
 
-        let start = unsafe { self.section_start.ptr.add(skip) };
-        let stop = self.section_stop.ptr;
-        let byte_offset = stop as usize - start as usize;
-        let len = byte_offset / self.stride;
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            // On Windows/UEFI, boundary elements are non-ZST (MaybeUninit<T>
+            // and isize) so dupcheck and slice boundary arithmetic must
+            // account for their size.
+            let skip = usize::from(cfg!(any(target_os = "uefi", target_os = "windows")));
+            if self.dupcheck_start.ptr.wrapping_add(skip + 1) < self.dupcheck_stop.ptr {
+                panic!("duplicate #[distributed_slice] with name \"{}\"", self.name);
+            }
 
-        // On Windows, the implementation involves growing a &[T; 0] to
-        // encompass elements that we have asked the linker to place immediately
-        // after that location. The compiler sees this as going "out of bounds"
-        // based on provenance, so we must conceal what is going on.
-        #[cfg(any(target_os = "uefi", target_os = "windows"))]
-        let start = hint::black_box(start);
+            let start = unsafe { self.section_start.ptr.add(skip) };
+            let stop = self.section_stop.ptr;
+            let byte_offset = stop as usize - start as usize;
+            let len = byte_offset / self.stride;
 
-        unsafe { slice::from_raw_parts(start, len) }
+            // On Windows, the implementation involves growing a &[T; 0] to
+            // encompass elements that we have asked the linker to place
+            // immediately after that location. The compiler sees this as going
+            // "out of bounds" based on provenance, so we must conceal what is
+            // going on.
+            #[cfg(any(target_os = "uefi", target_os = "windows"))]
+            let start = hint::black_box(start);
+
+            unsafe { slice::from_raw_parts(start, len) }
+        }
+    }
+
+    /// Iterate over references to all registered elements at their original
+    /// static addresses, in declaration/sort-key order.
+    ///
+    /// On most platforms this is equivalent to `self.static_slice().iter()`,
+    /// because the linker section already holds the original element storage.
+    /// On wasm32 targets, `static_slice()` returns references into a fresh
+    /// byte-copy of the registered elements; `iter_refs()` returns references
+    /// to the original element statics, which matters when elements contain
+    /// interior mutability (`AtomicUsize`, `UnsafeCell`, etc.) or when pointer
+    /// identity with the declaring static must be preserved.
+    pub fn iter_refs(self) -> impl Iterator<Item = &'static T>
+    where
+        T: 'static,
+    {
+        #[cfg(target_arch = "wasm32")]
+        {
+            unsafe { (*self.wasm_registry.ptr).iter_refs() }
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            self.static_slice().iter()
+        }
     }
 }
 

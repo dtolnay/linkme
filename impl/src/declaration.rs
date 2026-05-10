@@ -112,6 +112,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let call_site = Span::call_site();
     let link_section_macro_str = format!("_linkme_macro_{}", ident);
     let link_section_macro = Ident::new(&link_section_macro_str, call_site);
+    let registry_str = format!("_LINKME_REGISTRY_{}", ident);
+    let registry = Ident::new(&registry_str, call_site);
 
     let unsafe_extern = if cfg!(no_unsafe_extern_blocks) {
         None
@@ -131,6 +133,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
     };
 
     quote! {
+        #[cfg(target_arch = "wasm32")]
+        #[doc(hidden)]
+        static #registry: #linkme_path::#private::WasmRegistry<
+            <#ty as #linkme_path::#private::Slice>::Element,
+        > = #linkme_path::#private::WasmRegistry::new();
+
         #(#attrs)*
         #vis static #ident: #linkme_path::DistributedSlice<#ty> = {
             #[cfg(any(
@@ -217,6 +225,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             static DUPCHECK: #linkme_path::#private::isize = 1;
 
             #[cfg(not(any(
+                target_arch = "wasm32",
                 target_os = "none",
                 target_os = "linux",
                 target_os = "macos",
@@ -233,6 +242,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             )))]
             #unsupported_platform
 
+            #[cfg(not(target_arch = "wasm32"))]
             unsafe {
                 #linkme_path::DistributedSlice::private_new(
                     #name,
@@ -246,6 +256,14 @@ pub fn expand(input: TokenStream) -> TokenStream {
                         .cast::<#linkme_path::#private::isize>(),
                 )
             }
+
+            #[cfg(target_arch = "wasm32")]
+            unsafe {
+                #linkme_path::DistributedSlice::private_new_wasm(
+                    #name,
+                    #linkme_path::#private::ptr::addr_of!(#registry),
+                )
+            }
         };
 
         #[doc(hidden)]
@@ -254,7 +272,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
             (
                 #![linkme_macro = $macro:path]
                 #![linkme_sort_key = $key:tt]
-                $item:item
+                $($item:tt)*
             ) => {
                 $macro ! {
                     #![linkme_linux_section = concat!(#linux_section, $key)]
@@ -262,12 +280,14 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     #![linkme_windows_section = concat!(#windows_section, $key)]
                     #![linkme_illumos_section = concat!(#illumos_section, $key)]
                     #![linkme_bsd_section = concat!(#bsd_section, $key)]
-                    $item
+                    #![linkme_sort_key = $key]
+                    #![linkme_slice = $macro]
+                    $($item)*
                 }
             };
             (
                 #![linkme_macro = $macro:path]
-                $item:item
+                $($item:tt)*
             ) => {
                 $macro ! {
                     #![linkme_linux_section = #linux_section]
@@ -275,7 +295,9 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     #![linkme_windows_section = #windows_section]
                     #![linkme_illumos_section = #illumos_section]
                     #![linkme_bsd_section = #bsd_section]
-                    $item
+                    #![linkme_sort_key = ""]
+                    #![linkme_slice = $macro]
+                    $($item)*
                 }
             };
             (
@@ -284,7 +306,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #![linkme_windows_section = $windows_section:expr]
                 #![linkme_illumos_section = $illumos_section:expr]
                 #![linkme_bsd_section = $bsd_section:expr]
-                $item:item
+                #![linkme_sort_key = $sort_key:tt]
+                #![linkme_slice = $slice:path]
+                $(#[$attr:meta])*
+                $vis:vis static $element:ident : $ty:ty = $expr:expr;
             ) => {
                 #used
                 #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = $linux_section))]
@@ -292,7 +317,30 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = $windows_section))]
                 #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = $illumos_section))]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = $bsd_section))]
-                $item
+                $(#[$attr])*
+                $vis static $element : $ty = $expr;
+
+                #[cfg(target_arch = "wasm32")]
+                const _: () = {
+                    static __NODE: #linkme_path::#private::WasmEntryNode<$ty> =
+                        #linkme_path::#private::WasmEntryNode::new(
+                            $sort_key,
+                            #linkme_path::#private::ptr::addr_of!($element),
+                        );
+
+                    extern "C" fn __linkme_init() {
+                        unsafe {
+                            #linkme_path::DistributedSlice::private_wasm_register(
+                                $slice,
+                                &__NODE,
+                            );
+                        }
+                    }
+
+                    #used
+                    #[#unsafe_attr(#link_section_attr = ".init_array")]
+                    static __LINKME_INIT_ARRAY: extern "C" fn() = __linkme_init;
+                };
             };
         }
 

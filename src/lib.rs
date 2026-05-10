@@ -12,9 +12,9 @@
 //!
 //! # Platform support
 //!
-//! | Component | Linux | macOS | Windows | FreeBSD | OpenBSD | illumos | Other...<sup>†</sup> |
-//! |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-//! | Distributed slice | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | |
+//! | Component | Linux | wasm32 | macOS | Windows | FreeBSD | OpenBSD | illumos | Other...<sup>†</sup> |
+//! |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+//! | Distributed slice | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | |
 //!
 //! <br>***<sup>†</sup>*** We welcome PRs adding support for any platforms not
 //! listed here.
@@ -23,10 +23,11 @@
 //!
 //! # Distributed slice
 //!
-//! A distributed slice is a collection of static elements that are gathered
-//! into a contiguous section of the binary by the linker. Slice elements may be
-//! defined individually from anywhere in the dependency graph of the final
-//! binary.
+//! A distributed slice is a collection of static elements. On most platforms
+//! they are gathered into a contiguous section of the binary by the linker. On
+//! wasm32 targets, startup constructors register elements and the slice is
+//! materialized on first access. Slice elements may be defined individually
+//! from anywhere in the dependency graph of the final binary.
 //!
 //! Refer to [`linkme::DistributedSlice`][DistributedSlice] for complete details
 //! of the API. The basic idea is as follows.
@@ -146,6 +147,9 @@
     clippy::must_use_candidate,
     clippy::unused_self
 )]
+
+#[cfg(target_arch = "wasm32")]
+extern crate alloc;
 
 mod distributed_slice;
 mod private;

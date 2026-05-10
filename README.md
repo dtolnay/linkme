@@ -5,9 +5,9 @@
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-linkme-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/linkme)
 [<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/dtolnay/linkme/ci.yml?branch=master&style=for-the-badge" height="20">](https://github.com/dtolnay/linkme/actions?query=branch%3Amaster)
 
-| Component | Linux | macOS | Windows | FreeBSD | OpenBSD | illumos | Other...<sup>†</sup> |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| [Distributed slice] | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | |
+| Component | Linux | wasm32 | macOS | Windows | FreeBSD | OpenBSD | illumos | Other...<sup>†</sup> |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| [Distributed slice] | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | 💚 | |
 
 <b><sup>†</sup></b> We welcome PRs adding support for any platforms not listed
 here.
@@ -23,14 +23,20 @@ linkme = "0.3"
 
 # Distributed slice
 
-A distributed slice is a collection of static elements that are gathered into a
-contiguous section of the binary by the linker. Slice elements may be defined
-individually from anywhere in the dependency graph of the final binary.
+A distributed slice is a collection of static elements. On most platforms they
+are gathered into a contiguous section of the binary by the linker; on wasm32
+targets, startup constructors register elements and the slice is materialized
+on first access. Slice elements may be defined individually from anywhere in the
+dependency graph of the final binary.
 
 The implementation is based on `link_section` attributes and platform-specific
-linker support. It does not involve life-before-main or any other runtime
-initialization on any platform. This is a zero-cost safe abstraction that
-operates entirely during compilation and linking.
+linker support. Except on wasm32, it does not involve life-before-main or any
+other runtime initialization. On wasm32, startup constructors are used to
+collect elements because wasm custom sections cannot carry the relocations
+needed by arbitrary Rust statics. On `wasm32-unknown-emscripten` and WASI
+targets the runtime invokes these constructors automatically; on
+`wasm32-unknown-unknown` the embedder must call `__wasm_call_ctors` explicitly
+(wasm-bindgen handles this transparently).
 
 ### Declaration
 
