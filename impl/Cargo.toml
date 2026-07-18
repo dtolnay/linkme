@@ -18,7 +18,7 @@ used_linker = []
 [dependencies]
 proc-macro2 = "1.0.74"
 quote = "1.0.35"
-syn = "2.0.46"
+syn = "3"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]

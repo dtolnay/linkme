@@ -4,8 +4,8 @@ use quote::{format_ident, quote, quote_spanned};
 use syn::parse::{Error, Parse, ParseStream, Result};
 use syn::punctuated::Punctuated;
 use syn::{
-    braced, parenthesized, parse_quote, Abi, Attribute, BareFnArg, BoundLifetimes, GenericParam,
-    Generics, Ident, Path, ReturnType, Token, Type, TypeBareFn, Visibility, WhereClause,
+    braced, parenthesized, parse_quote, Abi, Attribute, BoundLifetimes, GenericParam, Generics,
+    Ident, NamedArg, Path, ReturnType, Token, Type, TypeFnPtr, Visibility, WhereClause,
 };
 
 pub struct Element {
@@ -80,7 +80,7 @@ impl Parse for Element {
                 };
                 let colon_token: Token![:] = content.parse()?;
                 let ty: Type = content.parse()?;
-                inputs.push_value(BareFnArg {
+                inputs.push_value(NamedArg {
                     attrs: Vec::new(),
                     name: Some((ident, colon_token)),
                     ty,
@@ -164,7 +164,8 @@ impl Parse for Element {
             ];
             let vis = Visibility::Inherited;
             let expr = parse_quote!(#ident);
-            let ty = Type::BareFn(TypeBareFn {
+            let ty = Type::FnPtr(TypeFnPtr {
+                attrs: Vec::new(),
                 lifetimes,
                 unsafety,
                 abi,
