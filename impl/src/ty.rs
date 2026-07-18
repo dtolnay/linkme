@@ -34,7 +34,7 @@ pub(crate) fn populate_static_lifetimes(ty: &mut Type) {
         | Type::Macro(_)
         | Type::Never(_)
         | Type::TraitObject(_)
-        | Type::BareFn(_)
+        | Type::FnPtr(_)
         | Type::Verbatim(_) => {}
 
         _ => unimplemented!("unknown Type"),
