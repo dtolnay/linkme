@@ -9,8 +9,8 @@ publish = false
 used_linker = ["linkme/used_linker"]
 
 [dependencies]
-cortex-m = "0.7"
+cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
 cortex-m-rt = "0.7"
-cortex-m-semihosting = "0.5"
+cortex-m-semihosting = "0.6"
 linkme = { path = "../.." }
-panic-semihosting = { version = "0.6", features = ["exit"] }
+panic-semihosting = { version = "0.7", features = ["exit"] }
