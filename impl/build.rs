@@ -9,6 +9,10 @@ fn main() {
         return;
     };
 
+    if rustc >= 101 {
+        println!("cargo:rustc-env=TARGET_OS_HYPERLIGHT_KNOWN=1");
+    }
+
     if rustc >= 80 {
         println!("cargo:rustc-check-cfg=cfg(exhaustive)");
         println!("cargo:rustc-check-cfg=cfg(no_unsafe_attributes)");
