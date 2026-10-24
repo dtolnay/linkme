@@ -11,6 +11,8 @@ error[E0308]: mismatched types
 note: method defined here
   --> src/distributed_slice.rs
    |
+   | impl<T> DistributedSlice<[T]> {
+...
    |     pub unsafe fn private_typecheck(self, get: fn() -> &'static T) {
    |                   ^^^^^^^^^^^^^^^^^
 
@@ -27,5 +29,7 @@ error[E0308]: mismatched types
 note: method defined here
   --> src/distributed_slice.rs
    |
+   | impl<T> DistributedSlice<[T]> {
+...
    |     pub unsafe fn private_typecheck(self, get: fn() -> &'static T) {
    |                   ^^^^^^^^^^^^^^^^^
