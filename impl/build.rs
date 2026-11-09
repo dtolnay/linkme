@@ -9,12 +9,9 @@ fn main() {
         return;
     };
 
-    if rustc >= 101 {
-        println!("cargo:rustc-env=TARGET_OS_HYPERLIGHT_KNOWN=1");
-    }
-
     if rustc >= 80 {
         println!("cargo:rustc-check-cfg=cfg(exhaustive)");
+        println!("cargo:rustc-check-cfg=cfg(no_target_os_hyperlight)");
         println!("cargo:rustc-check-cfg=cfg(no_unsafe_attributes)");
         println!("cargo:rustc-check-cfg=cfg(no_unsafe_extern_blocks)");
     }
@@ -24,6 +21,11 @@ fn main() {
         println!("cargo:rustc-cfg=no_unsafe_attributes");
         // https://blog.rust-lang.org/2024/10/17/Rust-1.82.0.html#safe-items-with-unsafe-extern
         println!("cargo:rustc-cfg=no_unsafe_extern_blocks");
+    }
+
+    if rustc < 101 {
+        // https://github.com/rust-lang/rust/pull/163144
+        println!("cargo:rustc-cfg=no_target_os_hyperlight");
     }
 }
 
