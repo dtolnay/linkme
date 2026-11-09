@@ -55,6 +55,13 @@ jobs:
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Zrandomize-layout >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
         shell: bash
+      - name: Install ld.gold linker
+        run: |
+          sudo rm -f /var/lib/man-db/auto-update
+          sudo apt-get update
+          sudo apt-get install -y binutils-gold
+        if: matrix.linker == 'gold'
+        shell: bash
       - name: Select non-default linker
         run: echo RUSTFLAGS=${RUSTFLAGS}\ -Clinker-features=-lld -Clink-arg=-fuse-ld=${{matrix.linker}} >> $GITHUB_ENV
         if: matrix.linker
