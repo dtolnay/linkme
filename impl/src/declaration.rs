@@ -50,6 +50,12 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let error = Error::new_spanned(&input, msg);
     let unsupported_platform = error.to_compile_error();
 
+    let target_os_hyperlight = if std::option_env!("TARGET_OS_HYPERLIGHT_KNOWN").is_some() {
+        quote!(, target_os = "hyperlight")
+    } else {
+        quote!()
+    };
+
     let decl: Declaration = match syn::parse2(input) {
         Ok(decl) => decl,
         Err(err) => return err.to_compile_error(),
@@ -144,28 +150,29 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
                 target_os = "openbsd",
-                target_os = "psp",
+                target_os = "psp"
+                #target_os_hyperlight
             ))]
             #unsafe_extern extern "Rust" {
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_section_start)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), link_name = #linux_section_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_start)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_section_start)]
                 static LINKME_START: [<#ty as #linkme_path::#private::Slice>::Element; 0];
 
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_section_stop)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), link_name = #linux_section_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_section_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_section_stop)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_section_stop)]
                 static LINKME_STOP: [<#ty as #linkme_path::#private::Slice>::Element; 0];
 
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_dupcheck_start)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), link_name = #linux_dupcheck_start)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_start)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_start)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_dupcheck_start)]
                 static DUPCHECK_START: ();
 
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), link_name = #linux_dupcheck_stop)]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), link_name = #linux_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), link_name = #macho_dupcheck_stop)]
                 #[cfg_attr(target_os = "illumos", link_name = #illumos_dupcheck_stop)]
                 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link_name = #bsd_dupcheck_stop)]
@@ -201,15 +208,16 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
                 target_os = "openbsd",
-                target_os = "psp",
+                target_os = "psp"
+                #target_os_hyperlight
             ))]
-            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = #linux_section))]
+            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), #unsafe_attr(#link_section_attr = #linux_section))]
             #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = #illumos_section))]
             #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), #unsafe_attr(#link_section_attr = #bsd_section))]
             static mut LINKME_PLEASE: [<#ty as #linkme_path::#private::Slice>::Element; 0] = [];
 
             #used
-            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = #linux_dupcheck))]
+            #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), #unsafe_attr(#link_section_attr = #linux_dupcheck))]
             #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), #unsafe_attr(#link_section_attr = #macho_dupcheck))]
             #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = #windows_dupcheck))]
             #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = #illumos_dupcheck))]
@@ -229,7 +237,8 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
                 target_os = "openbsd",
-                target_os = "psp",
+                target_os = "psp"
+                #target_os_hyperlight
             )))]
             #unsupported_platform
 
@@ -287,7 +296,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 $item:item
             ) => {
                 #used
-                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp"), #unsafe_attr(#link_section_attr = $linux_section))]
+                #[cfg_attr(any(target_os = "none", target_os = "linux", target_os = "android", target_os = "fuchsia", target_os = "psp" #target_os_hyperlight), #unsafe_attr(#link_section_attr = $linux_section))]
                 #[cfg_attr(any(target_os = "macos", target_os = "ios", target_os = "tvos"), #unsafe_attr(#link_section_attr = $macho_section))]
                 #[cfg_attr(any(target_os = "uefi", target_os = "windows"), #unsafe_attr(#link_section_attr = $windows_section))]
                 #[cfg_attr(target_os = "illumos", #unsafe_attr(#link_section_attr = $illumos_section))]
