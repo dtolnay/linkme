@@ -24,6 +24,7 @@ fn main() {
     }
 
     if rustc < 101 {
+        // https://github.com/rust-lang/rust/pull/163144
         println!("cargo:rustc-cfg=no_target_os_hyperlight");
     }
 }
