@@ -50,10 +50,10 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let error = Error::new_spanned(&input, msg);
     let unsupported_platform = error.to_compile_error();
 
-    let target_os_hyperlight = if cfg!(target_os_hyperlight_known) {
-        quote!(, target_os = "hyperlight")
-    } else {
+    let target_os_hyperlight = if cfg!(no_target_os_hyperlight) {
         quote!()
+    } else {
+        quote!(, target_os = "hyperlight")
     };
 
     let decl: Declaration = match syn::parse2(input) {
