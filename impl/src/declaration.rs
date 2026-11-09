@@ -53,7 +53,9 @@ pub fn expand(input: TokenStream) -> TokenStream {
     let target_os_hyperlight = if cfg!(no_target_os_hyperlight) {
         quote!()
     } else {
-        quote!(, target_os = "hyperlight")
+        quote! {
+            target_os = "hyperlight",
+        }
     };
 
     let decl: Declaration = match syn::parse2(input) {
@@ -150,7 +152,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
                 target_os = "openbsd",
-                target_os = "psp"
+                target_os = "psp",
                 #target_os_hyperlight
             ))]
             #unsafe_extern extern "Rust" {
@@ -160,7 +162,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                         target_os = "linux",
                         target_os = "android",
                         target_os = "fuchsia",
-                        target_os = "psp"
+                        target_os = "psp",
                         #target_os_hyperlight
                     ),
                     link_name = #linux_section_start
@@ -176,7 +178,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                         target_os = "linux",
                         target_os = "android",
                         target_os = "fuchsia",
-                        target_os = "psp"
+                        target_os = "psp",
                         #target_os_hyperlight
                     ),
                     link_name = #linux_section_stop
@@ -192,7 +194,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                         target_os = "linux",
                         target_os = "android",
                         target_os = "fuchsia",
-                        target_os = "psp"
+                        target_os = "psp",
                         #target_os_hyperlight
                     ),
                     link_name = #linux_dupcheck_start
@@ -208,7 +210,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                         target_os = "linux",
                         target_os = "android",
                         target_os = "fuchsia",
-                        target_os = "psp"
+                        target_os = "psp",
                         #target_os_hyperlight
                     ),
                     link_name = #linux_dupcheck_stop
@@ -248,7 +250,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
                 target_os = "openbsd",
-                target_os = "psp"
+                target_os = "psp",
                 #target_os_hyperlight
             ))]
             #[cfg_attr(
@@ -257,7 +259,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     target_os = "linux",
                     target_os = "android",
                     target_os = "fuchsia",
-                    target_os = "psp"
+                    target_os = "psp",
                     #target_os_hyperlight
                 ),
                 #unsafe_attr(#link_section_attr = #linux_section)
@@ -273,7 +275,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                     target_os = "linux",
                     target_os = "android",
                     target_os = "fuchsia",
-                    target_os = "psp"
+                    target_os = "psp",
                     #target_os_hyperlight
                 ),
                 #unsafe_attr(#link_section_attr = #linux_dupcheck)
@@ -297,7 +299,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                 target_os = "illumos",
                 target_os = "freebsd",
                 target_os = "openbsd",
-                target_os = "psp"
+                target_os = "psp",
                 #target_os_hyperlight
             )))]
             #unsupported_platform
@@ -362,7 +364,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
                         target_os = "linux",
                         target_os = "android",
                         target_os = "fuchsia",
-                        target_os = "psp"
+                        target_os = "psp",
                         #target_os_hyperlight
                     ),
                     #unsafe_attr(#link_section_attr = $linux_section)
